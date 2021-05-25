@@ -15,9 +15,9 @@ abstracts the information).
 '''
 
 import json
-import ConfigParser
+import configparser
 
-from designpatterns import singleton, memoize
+from .designpatterns import singleton, memoize
 
 
 @singleton
@@ -25,7 +25,7 @@ class AppConfig(object):
     ''' An object that contains the runtime configuration for this application. '''
 
     def __init__(self):
-        self.config = ConfigParser.ConfigParser()
+        self.config = configparser.ConfigParser()
         self.config.read("api.config")
         self.dr2instr = None
 
