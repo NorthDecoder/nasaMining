@@ -1,8 +1,27 @@
-var mongojs = require("mongojs")({});
-var db = require("mongojs")
-    .connect('mongodb://nasahack:hacking4nasa@proximus.modulusmongo.net:27017/tepO9seb',
-    ['datasets', 'keywords', 'kw_pair_freq', 'nasa_np_strengths_b', 'related_datasets']);
+const mongojs = require('mongojs');
+require('dotenv').config();
 
+// expecting to find that the nasaMining/frontEnd/.env file
+// has the following secrets for the MongoDB
+const adminName = process.env.ADMIN_NAME
+const adminPassword = process.env.ADMIN_PASSWORD
+const serverMongo = process.env.SERVER_MONGO
+
+/*  See articles discussing securing secrets
+  https://movingfast.io/articles/environment-variables-considered-harmful/
+
+  ie, not a secure production method of storing the secrets!
+ */
+
+var urlToMongo  = 'mongodb://' +
+                   adminName + ":" +                   adminPassword +
+                   "@" + serverMongo
+
+const collections = ['datasets', 'keywords', 'kw_pair_freq', 'nasa_np_strengths_b', 'related_datasets']
+
+const db = mongojs( urlToMongo, collections );
+// Reference:
+//   https://docs.mongodb.com/drivers/node/current/fundamentals/connection/
 
 exports.getDatasets = function (req, res) {
     var query = req.query.q;
