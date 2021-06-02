@@ -10,4 +10,6 @@ Thumbs.db
 .pydevproject
 .project
 
-./frontEnd/node_modules*
+node_modules*
+.env
+
