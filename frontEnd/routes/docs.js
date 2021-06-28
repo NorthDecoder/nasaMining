@@ -1,28 +1,74 @@
-const mongojs = require('mongojs');
+const mongoose = require('mongoose');
 require('dotenv').config();
+
+const currentWorkingDirectory = `${__dirname}/`
 
 // expecting to find that the nasaMining/frontEnd/.env file
 // has the following secrets for the MongoDB
-const adminName = process.env.ADMIN_NAME
+const adminName     = process.env.ADMIN_NAME
 const adminPassword = process.env.ADMIN_PASSWORD
-const serverMongo = process.env.SERVER_MONGO
+const serverMongo   = process.env.SERVER_MONGO
+const filenameSSLCA = process.env.FILENAME_SSLCA
+const pathToSSLCA   = `${__dirname}/`.replace("routes","secrets")
+                      + filenameSSLCA
+
+// Inputs must be defined and nonblank
+if ( (adminName === undefined) || (adminName === "") ){
+  console.log(`Error in ${__filename} . `, "Expecting variable ADMIN_NAME to be defined and not blank in the .env file." )
+  process.exit(1)
+}
+if ( (adminPassword === undefined) || (adminPassword === "") ){
+  console.log(`Error in ${__filename} . `, "Expecting variable ADMIN_PASSWORD to be defined in the .env file.")
+    process.exit(1)
+}
+if ( (serverMongo === undefined) || (serverMongo === "") ){
+  console.log(`Error in ${__filename} . `, "Expecting variable SERVER_MONGO to be defined in the .env file.")
+  process.exit(1)
+}
+if( (filenameSSLCA === undefined) || (filenameSSLCA === "") ) {
+
+  console.log(`Error in ${__filename} . `, "Expecting variable FILENAME_SSLCA to be defined in the .env file.")
+  process.exit(1)
+}
 
 /*  See articles discussing securing secrets
   https://movingfast.io/articles/environment-variables-considered-harmful/
 
-  ie, not a secure production method of storing the secrets!
+  ie, .env not a secure production method of storing the secrets?!
  */
 
 var urlToMongo  = 'mongodb://' +
-                   adminName + ":" +                   adminPassword +
+                   adminName + ":" + adminPassword +
                    "@" + serverMongo
+
+// expecting sslCA for the MongoDb to be installed
+var connectionParameters = {
+    useNewUrlParser: true
+    ,useUnifiedTopology: true
+    ,ssl: true
+    ,sslValidate: true
+    ,sslCA: require('fs').readFileSync( pathToSSLCA )
+    }
 
 const collections = ['datasets', 'keywords', 'kw_pair_freq', 'nasa_np_strengths_b', 'related_datasets']
 
-const db = mongojs( urlToMongo, collections );
+
+// Ref: https://mongoosejs.com/docs/index.html
+//      https://mongoosejs.com/docs/tutorials/ssl.html
+mongoose.connect( urlToMongo, connectionParameters );
+const db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+    //console.log( "connected to " + urlToMongo )
+  console.log("Connected to MongoDB.")
+  console.log(" ")
+});
 // Reference:
 //   https://docs.mongodb.com/drivers/node/current/fundamentals/connection/
 
+
+//* * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 exports.getDatasets = function (req, res) {
     var query = req.query.q;
     var using = req.query.field;
@@ -206,8 +252,10 @@ exports.getCoOccuringKWs = function (req, res) {
 
 exports.getCoOccuringKWsFlat = function (req, res) {
     var query = req.query.q;
-
-    if (query == undefined) res.send({'error': 'you must pass in a query, of form q='});
+    if ( (query === undefined) || (query === "") ){
+      res.send({ 'error': 'you must pass in a query, of form q=' })
+      console.log( new Error("Expecting query to be defined and not blank") )
+    }
     else {
         db.keywords.find(
             {"source": "http://data.nasa.gov/data.json", "keyword": {"$regex": new RegExp('^' + query, 'i')}},
