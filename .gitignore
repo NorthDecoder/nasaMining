@@ -10,4 +10,11 @@ Thumbs.db
 .pydevproject
 .project
 
-./frontEnd/node_modules*
+# nodejs related
+node_modules*
+
+# environmental variables
+.env
+
+#certificates of authentication
+*.pem
