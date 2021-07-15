@@ -125,7 +125,55 @@ sudo firewall-cmd --remove-service=http --permanent
 systemctl restart firewalld
 ```
 
+## * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+## Mongo Work
 
+### Initialization
+
+```bash
+# only once
+pip install pymongo[tls]  # secure connector for MongoDB
+pip install python-dotenv # access the .env file
+
+# if you want to update to the latest NASA data then,
+cd ~/nasaMining/data
+wget -o nasa.json "https://data.nasa.gov/data.json"
+```
+## Add environment variables file
+
+A `.env` file is expected to be created (by you) in
+the directory `nasaMining/mongoWork/` containing
+something like the following, with your MongoDB
+credentials, not the placeholders shown.
+> This is the same information that is in the .env
+> file placed in the frontEnd directory. For now
+> they are duplicated. It would be nice for me to
+> to figure out how to get the front end code
+> to access a .env file that is up one directory
+> level.  That way there could be just one .env
+> file.
+
+
+```bash
+# filename: .env
+ADMIN_NAME="your-mongo-administrator-name"
+
+ADMIN_PASSWORD="your-super-long-secret-MongoDB-password"
+
+SERVER_MONGO="dbaas889.hyperp-dbaas.cloud.ibm.com:29083,dbaas890.hyperp-dbaas.cloud.ibm.com:29502,dbaas891.hyperp-dbaas.cloud.ibm.com:29338"
+
+# the name of the MongoDB SSL certificate file to be
+# placed in the nasaMining/mongoWork/secrets/ directory
+FILENAME_SSLCA="rootCA.pem"
+```
+```bash
+#build the database
+cd ~/nasaMining/mongoWork
+python3 buildDB.py
+```
+
+
+## * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ## Notes
 
 * It is not clear why there is Flask folder in the frontEnd/
