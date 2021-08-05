@@ -137,7 +137,7 @@ pip install python-dotenv # access the .env file
 
 # if you want to update to the latest NASA data then,
 cd ~/nasaMining/data
-wget -o nasa.json "https://data.nasa.gov/data.json"
+wget -O nasa.json "https://data.nasa.gov/data.json"
 ```
 ## Add environment variables file
 
