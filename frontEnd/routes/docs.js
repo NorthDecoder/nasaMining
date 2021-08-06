@@ -40,7 +40,9 @@ if( (filenameSSLCA === undefined) || (filenameSSLCA === "") ) {
 
 var urlToMongo  = 'mongodb://' +
                    adminName + ":" + adminPassword +
-                   "@" + serverMongo
+                   "@" + serverMongo + "?" +
+                   "tls=true&" +
+                   "tlsCAFile=" + pathToSSLCA
 
 // expecting sslCA for the MongoDb to be installed
 var connectionParameters = {
