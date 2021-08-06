@@ -12,7 +12,7 @@ const filenameSSLCA = process.env.FILENAME_SSLCA
 const pathToSSLCA   = `${__dirname}/`.replace("routes","secrets")
                       + filenameSSLCA
 
-console.log("serverMongo", serverMongo)
+console.log("\nserverMongo:", serverMongo)
 // Inputs must be defined and nonblank
 if ( (adminName === undefined) || (adminName === "") ){
   console.log(`Error in ${__filename} . `, "Expecting variable ADMIN_NAME to be defined and not blank in the .env file." )
@@ -68,7 +68,7 @@ const dbName = 'jsonfromnasa'
 async function main() {
   // Use connect method to connect to the server
   await client.connect()
-  console.log('Connected successfully to server')
+  console.log('\nConnected successfully to MongoDb server')
   const db = client.db(dbName)
   const collection = db.collection('documents')
 
@@ -87,18 +87,6 @@ main()
 
 
 
-
-
-/* from the 'old' mongoose code
- *
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-    //console.log( "connected to " + urlToMongo )
-  console.log("Connected to MongoDB.")
-  console.log(" ")
-});
-
-*/
 // Reference:
 //   https://docs.mongodb.com/drivers/node/current/fundamentals/connection/
 
