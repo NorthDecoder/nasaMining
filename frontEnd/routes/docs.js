@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb')
+const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
 const currentWorkingDirectory = `${__dirname}/`
@@ -55,10 +55,10 @@ const collections = ['datasets', 'keywords', 'kw_pair_freq', 'nasa_np_strengths_
 
 
 // Ref: https://github.com/mongodb/node-mongodb-native#connect-to-mongodb
-const client = new MongoClient(urlToMongo)
+const client = new MongoClient(urlToMongo, { useUnifiedTopology: true } )
 
 // Database Name
-const dbName = 'myProject'
+const dbName = 'jsonfromnasa'
 
 
 
