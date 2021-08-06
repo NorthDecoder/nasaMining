@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
 const currentWorkingDirectory = `${__dirname}/`
@@ -12,6 +12,7 @@ const filenameSSLCA = process.env.FILENAME_SSLCA
 const pathToSSLCA   = `${__dirname}/`.replace("routes","secrets")
                       + filenameSSLCA
 
+console.log("\nserverMongo:", serverMongo)
 // Inputs must be defined and nonblank
 if ( (adminName === undefined) || (adminName === "") ){
   console.log(`Error in ${__filename} . `, "Expecting variable ADMIN_NAME to be defined and not blank in the .env file." )
@@ -39,7 +40,9 @@ if( (filenameSSLCA === undefined) || (filenameSSLCA === "") ) {
 
 var urlToMongo  = 'mongodb://' +
                    adminName + ":" + adminPassword +
-                   "@" + serverMongo
+                   "@" + serverMongo + "?" +
+                   "tls=true&" +
+                   "tlsCAFile=" + pathToSSLCA
 
 // expecting sslCA for the MongoDb to be installed
 var connectionParameters = {
@@ -53,17 +56,37 @@ var connectionParameters = {
 const collections = ['datasets', 'keywords', 'kw_pair_freq', 'nasa_np_strengths_b', 'related_datasets']
 
 
-// Ref: https://mongoosejs.com/docs/index.html
-//      https://mongoosejs.com/docs/tutorials/ssl.html
-mongoose.connect( urlToMongo, connectionParameters );
-const db = mongoose.connection;
+// Ref: https://github.com/mongodb/node-mongodb-native#connect-to-mongodb
+const client = new MongoClient(urlToMongo, { useUnifiedTopology: true } )
 
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-    //console.log( "connected to " + urlToMongo )
-  console.log("Connected to MongoDB.")
-  console.log(" ")
-});
+// Database Name
+const dbName = 'jsonfromnasa'
+
+
+
+// copy pasta from link referenced above
+async function main() {
+  // Use connect method to connect to the server
+  await client.connect()
+  console.log('\nConnected successfully to MongoDb server')
+  const db = client.db(dbName)
+  const collection = db.collection('documents')
+
+  // the following code examples can be pasted here...
+
+  return 'done.'
+}
+
+main()
+  .then(console.log)
+  .catch(console.error)
+  .finally(() => client.close())
+
+
+
+
+
+
 // Reference:
 //   https://docs.mongodb.com/drivers/node/current/fundamentals/connection/
 
