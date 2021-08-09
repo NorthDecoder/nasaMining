@@ -4,15 +4,29 @@ require('dotenv').config();
 const currentWorkingDirectory = `${__dirname}/`
 
 // expecting to find that the nasaMining/frontEnd/.env file
-// has the following secrets for the MongoDB
+// has the following secrets and options for the MongoDB
 const adminName     = process.env.ADMIN_NAME
 const adminPassword = process.env.ADMIN_PASSWORD
 const serverMongo   = process.env.SERVER_MONGO
 const filenameSSLCA = process.env.FILENAME_SSLCA
 const pathToSSLCA   = `${__dirname}/`.replace("routes","secrets")
                       + filenameSSLCA
+// options
+const connectTimeoutMS = process.env.CONNECT_TIMEOUT_MS.replace(/['"]+/g, '')
+const debugLevels = [1,2,3]
 
-console.log("\nserverMongo:", serverMongo)
+// Database Name
+const dbName = 'jsonfromnasa'
+
+debugLevelOne   = debugLevels.filter( level => level === 1 )
+debugLevelTwo   = debugLevels.filter( level => level === 2 )
+debugLevelThree = debugLevels.filter( level => level === 3 )
+
+if ( debugLevelOne[0] != undefined ){
+   console.log("\ndebug level 1")
+   console.log("serverMongo:", serverMongo)
+}
+
 // Inputs must be defined and nonblank
 if ( (adminName === undefined) || (adminName === "") ){
   console.log(`Error in ${__filename} . `, "Expecting variable ADMIN_NAME to be defined and not blank in the .env file." )
@@ -38,31 +52,27 @@ if( (filenameSSLCA === undefined) || (filenameSSLCA === "") ) {
   ie, .env not a secure production method of storing the secrets?!
  */
 
-var urlToMongo  = 'mongodb://' +
-                   adminName + ":" + adminPassword +
-                   "@" + serverMongo + "?" +
-                   "tls=true&" +
-                   "tlsCAFile=" + pathToSSLCA
+var urlToMongo  = 'mongodb://'
+                   + adminName + ':' + adminPassword
+                   + '@' + serverMongo + '?'
+                   + 'tls=true'
+                   + '&tlsCAFile=' + pathToSSLCA
+                   + '&connectTimeoutMS=' + connectTimeoutMS
+                   + '&replicaSet=' + 'spacetags'
 
-// expecting sslCA for the MongoDb to be installed
-var connectionParameters = {
-    useNewUrlParser: true
-    ,useUnifiedTopology: true
-    ,ssl: true
-    ,sslValidate: true
-    ,sslCA: require('fs').readFileSync( pathToSSLCA )
-    }
+if ( debugLevelTwo[0] != undefined ){
+   console.log("\ndebug level 2")
+   console.log( "urlToMongo:" + urlToMongo )
+}
 
 const collections = ['datasets', 'keywords', 'kw_pair_freq', 'nasa_np_strengths_b', 'related_datasets']
 
 
 // Ref: https://github.com/mongodb/node-mongodb-native#connect-to-mongodb
-const client = new MongoClient(urlToMongo, { useUnifiedTopology: true } )
-
-// Database Name
-const dbName = 'jsonfromnasa'
-
-
+const client = new MongoClient(urlToMongo, {
+                   useNewUrlParser: true,
+	           useUnifiedTopology: true
+               } )
 
 // copy pasta from link referenced above
 async function main() {
