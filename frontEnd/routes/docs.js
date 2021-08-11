@@ -69,13 +69,13 @@ const collections = ['datasets', 'keywords', 'kw_pair_freq', 'nasa_np_strengths_
 
 
 // Ref: https://github.com/mongodb/node-mongodb-native#connect-to-mongodb
-const client = new MongoClient(urlToMongo, {
+const clientMongo = new MongoClient(urlToMongo, {
                    useNewUrlParser: true,
 	           useUnifiedTopology: true
                } )
 
 // copy pasta from link referenced above
-async function main() {
+async function dbConnect( client ) {
   // Use connect method to connect to the server
   await client.connect()
   console.log('\nConnected successfully to MongoDb server')
@@ -87,11 +87,10 @@ async function main() {
   return 'done.'
 }
 
-main()
+dbConnect( clientMongo )
   .then(console.log)
   .catch(console.error)
-  .finally(() => client.close())
-
+  .finally(() => clientMongo.close())
 
 
 
