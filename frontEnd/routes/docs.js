@@ -13,7 +13,9 @@ const pathToSSLCA   = `${__dirname}/`.replace("routes","secrets")
                       + filenameSSLCA
 // options
 const connectTimeoutMS = process.env.CONNECT_TIMEOUT_MS.replace(/['"]+/g, '')
-const debugLevels = [1,2,3]
+//const debugLevels = [1,2,3]
+//const debugLevels = [2,3]
+const debugLevels = [3]
 
 // Database Name
 const dbName = 'jsonfromnasa'
@@ -74,23 +76,50 @@ const clientMongo = new MongoClient(urlToMongo, {
 	           useUnifiedTopology: true
                } )
 
-// copy pasta from link referenced above
-async function dbConnect( client ) {
-  // Use connect method to connect to the server
-  await client.connect()
-  console.log('\nConnected successfully to MongoDb server')
-  const db = client.db(dbName)
-  const collection = db.collection('documents')
 
-  // the following code examples can be pasted here...
+function dbConnect ( client, namedDataBase ) {
+    return new Promise( ( resolve, reject ) => {
+        console.log( '\nCreating new connection to MongoDB server database name: ', namedDataBase )
+        client.connect()
+	let db = null
+        db = client.db( namedDataBase )
 
-  return 'done.'
-}
+        if (db) {
+           console.log('\nConnected successfully to MongoDb server')
+	   console.log( "db.s.namespace:\n", db.s.namespace )
+           resolve(db)
 
-dbConnect( clientMongo )
-  .then(console.log)
-  .catch(console.error)
-  .finally(() => clientMongo.close())
+           process.on( 'exit', ( code ) => { client.close() } )
+	} else {
+	   reject( "In function dbConnect, \nconnection to MongoDb not successful." )
+	}
+
+    });
+}// end function dbConnect
+
+
+
+
+
+
+
+//test the connection
+dbConnect( clientMongo, dbName )
+  .then( clientConnected => {
+         console.log("\nTest function dbConnect.")
+         console.log( "then clientConnected to:")
+         console.log( clientConnected.s.namespace )
+         clientConnected.listCollections().toArray( function(err, names) {
+	     if(!err) {
+                 console.log("\nlistCollections() array:")
+	         console.log(names)
+	     } else {
+	         console.log("\nlistCollections() array error:", err)
+	     }
+	 });
+  })
+  .catch( console.error )
+
 
 
 
