@@ -13,9 +13,9 @@ const pathToSSLCA   = `${__dirname}/`.replace("routes","secrets")
                       + filenameSSLCA
 // options
 const connectTimeoutMS = process.env.CONNECT_TIMEOUT_MS.replace(/['"]+/g, '')
-//const debugLevels = [1,2,3]
+const debugLevels = [1,2,3]
 //const debugLevels = [2,3]
-const debugLevels = [3]
+//const debugLevels = [3]
 
 // Database Name
 const dbName = 'jsonfromnasa'
