@@ -11,8 +11,9 @@ const defaultAddress = process.env.SERVER_ADDRESS || "0.0.0.0" //default to all 
 
 var app = express();
 app.get('/', function (req, res) {
-	//res.send('Hello world')
-	res.sendFile( current_dir +'/public/index.html' );
+	var indexPath = current_dir +'/public/index.html'
+	console.log( "in server.js" + "\nindexPath: ", indexPath )
+	res.sendFile( indexPath );
 });
 app.get('/getDatasets', docs.getDatasets);
 app.get('/getCoOccuringKWs', docs.getCoOccuringKWs);
@@ -30,6 +31,7 @@ var server = app.listen(serverPort, defaultAddress,function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  console.log('Spacetag app listening at http://%s:%s', host, port);
+  console.log('\nSpacetag app listening at http://%s:%s', host, port);
   console.log(" ")
 });
+
