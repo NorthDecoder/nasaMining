@@ -1,3 +1,4 @@
+const winston = require('winston');
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
@@ -79,7 +80,7 @@ const clientMongo = new MongoClient(urlToMongo, {
 
 let db = null;
 
-function dbConnect ( client, namedDataBase ) {
+async function dbConnect ( client, namedDataBase ) {
     return new Promise( ( resolve, reject ) => {
         console.log( '\nCreating new connection to MongoDB server database name: ', namedDataBase )
         client.connect()
