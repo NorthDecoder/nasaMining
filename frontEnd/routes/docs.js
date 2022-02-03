@@ -1,16 +1,34 @@
-const mongoose = require('mongoose');
+const winston = require('winston');
+const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
 const currentWorkingDirectory = `${__dirname}/`
 
 // expecting to find that the nasaMining/frontEnd/.env file
-// has the following secrets for the MongoDB
+// has the following secrets and options for the MongoDB
 const adminName     = process.env.ADMIN_NAME
 const adminPassword = process.env.ADMIN_PASSWORD
 const serverMongo   = process.env.SERVER_MONGO
 const filenameSSLCA = process.env.FILENAME_SSLCA
 const pathToSSLCA   = `${__dirname}/`.replace("routes","secrets")
                       + filenameSSLCA
+// options
+const connectTimeoutMS = process.env.CONNECT_TIMEOUT_MS.replace(/['"]+/g, '')
+const debugLevels = [1,2,3]
+//const debugLevels = [2,3]
+//const debugLevels = [3]
+
+// Database Name
+const dbName = 'jsonfromnasa'
+
+debugLevelOne   = debugLevels.filter( level => level === 1 )
+debugLevelTwo   = debugLevels.filter( level => level === 2 )
+debugLevelThree = debugLevels.filter( level => level === 3 )
+
+if ( debugLevelOne[0] != undefined ){
+   console.log("\ndebug level 1")
+   console.log("serverMongo:", serverMongo)
+}
 
 // Inputs must be defined and nonblank
 if ( (adminName === undefined) || (adminName === "") ){
@@ -37,33 +55,73 @@ if( (filenameSSLCA === undefined) || (filenameSSLCA === "") ) {
   ie, .env not a secure production method of storing the secrets?!
  */
 
-var urlToMongo  = 'mongodb://' +
-                   adminName + ":" + adminPassword +
-                   "@" + serverMongo
+var urlToMongo  = 'mongodb://'
+                   + adminName + ':' + adminPassword
+                   + '@' + serverMongo + '?'
+                   + 'tls=true'
+                   + '&tlsCAFile=' + pathToSSLCA
+                   + '&connectTimeoutMS=' + connectTimeoutMS
+                   + '&replicaSet=' + 'spacetags'
 
-// expecting sslCA for the MongoDb to be installed
-var connectionParameters = {
-    useNewUrlParser: true
-    ,useUnifiedTopology: true
-    ,ssl: true
-    ,sslValidate: true
-    ,sslCA: require('fs').readFileSync( pathToSSLCA )
-    }
+if ( debugLevelTwo[0] != undefined ){
+   console.log("\ndebug level 2")
+   console.log( "urlToMongo:" + urlToMongo )
+}
 
 const collections = ['datasets', 'keywords', 'kw_pair_freq', 'nasa_np_strengths_b', 'related_datasets']
 
 
-// Ref: https://mongoosejs.com/docs/index.html
-//      https://mongoosejs.com/docs/tutorials/ssl.html
-mongoose.connect( urlToMongo, connectionParameters );
-const db = mongoose.connection;
+// Ref: https://github.com/mongodb/node-mongodb-native#connect-to-mongodb
+const clientMongo = new MongoClient(urlToMongo, {
+                   useNewUrlParser: true,
+	           useUnifiedTopology: true
+               } )
 
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-    //console.log( "connected to " + urlToMongo )
-  console.log("Connected to MongoDB.")
-  console.log(" ")
-});
+
+let db = null;
+
+async function dbConnect ( client, namedDataBase ) {
+    return new Promise( ( resolve, reject ) => {
+        console.log( '\nCreating new connection to MongoDB server database name: ', namedDataBase )
+        client.connect()
+        db = client.db( namedDataBase )
+        process.on( 'exit', ( code ) => { client.close() } )
+
+        if (db) {
+           console.log('\nConnected successfully to MongoDb server')
+	   console.log( "db.s.namespace:\n", db.s.namespace )
+           resolve(db)
+	} else {
+	   reject( "In function dbConnect, \nconnection to MongoDb not successful." )
+	}
+
+    });
+}// end function dbConnect
+
+
+
+
+
+//test the connection
+dbConnect( clientMongo, dbName )
+  .then( clientConnected => {
+         console.log("\nTest function dbConnect.")
+         console.log( "then clientConnected to:")
+         console.log( clientConnected.s.namespace )
+         clientConnected.listCollections().toArray( function(err, names) {
+	     if(!err) {
+                 console.log("\nlistCollections() array:")
+	         console.log(names)
+	     } else {
+	         console.log("\nlistCollections() array error:", err)
+	     }
+	 });
+  })
+  .catch( console.error )
+
+
+
+
 // Reference:
 //   https://docs.mongodb.com/drivers/node/current/fundamentals/connection/
 
@@ -250,7 +308,7 @@ exports.getCoOccuringKWs = function (req, res) {
     }
 };
 
-exports.getCoOccuringKWsFlat = function (req, res) {
+exports.getCoOccuringKWsFlat_old = function (req, res) {
     var query = req.query.q;
     if ( (query === undefined) || (query === "") ){
       res.send({ 'error': 'you must pass in a query, of form q=' })
@@ -294,6 +352,30 @@ exports.getCoOccuringKWsFlat = function (req, res) {
             })
     }
 };
+//======================================================
+
+exports.getCoOccuringKWsFlat = function (req, res) {
+    console.log("\n===================================")
+    console.log("In function getCoOccuringKWsFlat")
+    var query = req.query.q;
+    if ( (query === undefined) || (query === "") ){
+      res.send({ 'error': 'you must pass in a query, of form q=' })
+      console.log( new Error("Expecting query to be defined and not blank") )
+    } else {
+      console.log( "query: ", query )
+    }
+
+    if (db){
+      console.log( "db.version is connected: ", db.version )
+    } else {
+      console.log( "db is not connected")
+    }
+
+    console.log("End function getCoOccuringKWsFlat")
+    console.log("===================================")
+    res.send( {result:"result"} )
+}
+//======================================================
 
 exports.getCoOccuringKWsMulti = function (req, res) {
     var keywords = JSON.parse(req.query.kws);
