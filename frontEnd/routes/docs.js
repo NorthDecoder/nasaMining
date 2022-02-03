@@ -1,3 +1,4 @@
+const winston = require('winston');
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
@@ -77,27 +78,25 @@ const clientMongo = new MongoClient(urlToMongo, {
                } )
 
 
-function dbConnect ( client, namedDataBase ) {
+let db = null;
+
+async function dbConnect ( client, namedDataBase ) {
     return new Promise( ( resolve, reject ) => {
         console.log( '\nCreating new connection to MongoDB server database name: ', namedDataBase )
         client.connect()
-	let db = null
         db = client.db( namedDataBase )
+        process.on( 'exit', ( code ) => { client.close() } )
 
         if (db) {
            console.log('\nConnected successfully to MongoDb server')
 	   console.log( "db.s.namespace:\n", db.s.namespace )
            resolve(db)
-
-           process.on( 'exit', ( code ) => { client.close() } )
 	} else {
 	   reject( "In function dbConnect, \nconnection to MongoDb not successful." )
 	}
 
     });
 }// end function dbConnect
-
-
 
 
 
@@ -119,8 +118,6 @@ dbConnect( clientMongo, dbName )
 	 });
   })
   .catch( console.error )
-
-
 
 
 
@@ -311,7 +308,7 @@ exports.getCoOccuringKWs = function (req, res) {
     }
 };
 
-exports.getCoOccuringKWsFlat = function (req, res) {
+exports.getCoOccuringKWsFlat_old = function (req, res) {
     var query = req.query.q;
     if ( (query === undefined) || (query === "") ){
       res.send({ 'error': 'you must pass in a query, of form q=' })
@@ -355,6 +352,30 @@ exports.getCoOccuringKWsFlat = function (req, res) {
             })
     }
 };
+//======================================================
+
+exports.getCoOccuringKWsFlat = function (req, res) {
+    console.log("\n===================================")
+    console.log("In function getCoOccuringKWsFlat")
+    var query = req.query.q;
+    if ( (query === undefined) || (query === "") ){
+      res.send({ 'error': 'you must pass in a query, of form q=' })
+      console.log( new Error("Expecting query to be defined and not blank") )
+    } else {
+      console.log( "query: ", query )
+    }
+
+    if (db){
+      console.log( "db.version is connected: ", db.version )
+    } else {
+      console.log( "db is not connected")
+    }
+
+    console.log("End function getCoOccuringKWsFlat")
+    console.log("===================================")
+    res.send( {result:"result"} )
+}
+//======================================================
 
 exports.getCoOccuringKWsMulti = function (req, res) {
     var keywords = JSON.parse(req.query.kws);
