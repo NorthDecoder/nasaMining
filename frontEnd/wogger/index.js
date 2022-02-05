@@ -14,15 +14,15 @@ commandLineArgs.forEach( argument => instruction(argument) )
 
 function instruction(cla) {
 
-  lvrvArray = cla.split("=") // right and left val
+  [ leftValue, rightValue ] = cla.split("=")
 
-  switch(lvrvArray[0]) {
+  switch(leftValue) {
     case '--logformat':
-      if ( lvrvArray[1]=== 'simple' ){
+      if ( rightValue === 'simple' ){
          requestedLogFormat  = winston.format.simple()
       }
 
-      if ( lvrvArray[1]=== 'json' ){
+      if ( rightValue === 'json' ){
          requestedLogFormat  = winston.format.json()
       }
       break;
