@@ -128,6 +128,8 @@ systemctl restart firewalld
 ## * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ## Mongo Work
 
+> Get data from NASA then load the data into a Mongo database
+
 ### Initialization
 
 ```bash
