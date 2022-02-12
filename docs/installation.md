@@ -168,8 +168,40 @@ SERVER_MONGO="dbaas889.hyperp-dbaas.cloud.ibm.com:29083,dbaas890.hyperp-dbaas.cl
 # placed in the nasaMining/mongoWork/secrets/ directory
 FILENAME_SSLCA="rootCA.pem"
 ```
+
+## FILENAME_SSLCA needs to be updated with the current SSL certificate
+
+> the filename just defined in the .env file needs to have the
+> actual cert uploaded into the secrets directory
+
+* Download the certificate from your MongoDB admin panel, or wherever the cert
+  is stored on your MongoDB server to a temporary local location.
+
+* With [sftp](https://www.ssh.com/academy/ssh/sftp) upload the recently downloaded
+  cert to the application server.  Something like the commands shown below.
+
+
 ```bash
-#build the database
+cd /my_temp_local_directory
+# just to make sure cert has been downloaded to the above directory
+ls
+cert.pem
+
+sftp myusername@ip-of-app-server
+cd nasaMining/mongoWork/secrets/
+
+#put localfilenme remotefilename
+put cert.pem rootCA.pem
+
+exit
+
+```
+
+
+
+```bash
+# build the database
+#
 cd ~/nasaMining/mongoWork
 python3 buildDB.py
 ```
