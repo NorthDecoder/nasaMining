@@ -3,6 +3,7 @@ var express = require('express'),
 	bodyParser = require('body-parser');*/
 	setImmediate = global.setImmediate;
 
+const cli = require('./cli.js')
 const process = require('process');
 const current_dir = process.cwd()
 const serverPort  = process.env.PORT || 3000 // web page server port
