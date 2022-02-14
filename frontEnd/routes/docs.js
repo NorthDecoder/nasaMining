@@ -1,8 +1,10 @@
-const winston = require('winston');
+const wogger = require('../wogger');// load the winston logger parameters
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
 const currentWorkingDirectory = `${__dirname}/`
+const fileName = __filename.split('\/').pop(); //forward slashes on linux :)
+wogger.info( 'Loading file: ' + currentWorkingDirectory + fileName )
 
 // expecting to find that the nasaMining/frontEnd/.env file
 // has the following secrets and options for the MongoDB
