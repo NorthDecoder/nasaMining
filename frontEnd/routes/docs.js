@@ -1,4 +1,4 @@
-const wogger = require('../wogger');// load the winston logger parameters
+const wogger = require('../utilities/wogger.js');// load the winston logger parameters
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
