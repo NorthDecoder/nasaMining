@@ -1,10 +1,22 @@
+/**
+ *
+ * file: docs.js
+ *
+ * Connect to the MongoDB database.
+ * Export functions that process word relations.
+ *
+ * */
+
 const wogger = require('../utilities/wogger.js');// load the winston logger parameters
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 
+
+const commandLineArgs = process.argv.slice(2);
 const currentWorkingDirectory = `${__dirname}/`
 const fileName = __filename.split('\/').pop(); //forward slashes on linux :)
 wogger.info( 'Loading file: ' + currentWorkingDirectory + fileName )
+
 
 // expecting to find that the nasaMining/frontEnd/.env file
 // has the following secrets and options for the MongoDB
@@ -14,14 +26,33 @@ const serverMongo   = process.env.SERVER_MONGO
 const filenameSSLCA = process.env.FILENAME_SSLCA
 const pathToSSLCA   = `${__dirname}/`.replace("routes","secrets")
                       + filenameSSLCA
+
 // options
 const connectTimeoutMS = process.env.CONNECT_TIMEOUT_MS.replace(/['"]+/g, '')
-const debugLevels = [1,2,3]
-//const debugLevels = [2,3]
-//const debugLevels = [3]
 
 // Database Name
 const dbName = 'jsonfromnasa'
+
+
+
+
+var debugLevels = [1] //default to at least one level
+//var debugLevels = [1,2,3]
+//var debugLevels = [2,3]
+//var debugLevels = [3]
+//var debugLevels = [1]
+commandLineArgs.forEach( argument => instruction(argument) )
+
+function instruction(cla) {
+    var [ leftValue, rightValue ] = cla.split("=")
+    switch(leftValue){
+      case '--debuglevels':
+        characterArray= rightValue.split( ',' )
+        debugLevels = characterArray.map(x => parseInt(x))
+        break;
+    }
+}
+
 
 debugLevelOne   = debugLevels.filter( level => level === 1 )
 debugLevelTwo   = debugLevels.filter( level => level === 2 )
