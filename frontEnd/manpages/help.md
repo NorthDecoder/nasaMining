@@ -20,17 +20,56 @@ node server.js --logformat=json
 node server.js --loglevel=info
 node server.js --loglevel=debug
 
+# set debug levels ( not part of winston )
+noder server.js --debuglevels=1
+noder server.js --debuglevels=1,2
+noder server.js --debuglevels=1,2,3
+
 ```
 
 ## Code Usage
 
 
+### wogger is winston logger!
+
 ```javascript
-// wogger is winston logger!
 // wogger javascript syntax
 const wogger = require('../utilities/wogger.js');
 wogger.info( 'My message here' + aVariableHere )
 wogger.debug( 'A debugging message here' )
+
+```
+
+### Setting debuglevels
+
+```javascript
+var debugLevels = [1] //default to at least one level
+//var debugLevels = [1,2,3]
+//var debugLevels = [2,3]
+//var debugLevels = [3]
+//var debugLevels = [1]
+commandLineArgs.forEach( argument => instruction(argument) )
+
+function instruction(cla) {
+    var [ leftValue, rightValue ] = cla.split("=")
+    switch(leftValue){
+      case '--debuglevels':
+        characterArray= rightValue.split( ',' )
+        debugLevels = characterArray.map(x => parseInt(x))
+        break;
+    }
+}
+
+
+debugLevelOne   = debugLevels.filter( level => level === 1 )
+debugLevelTwo   = debugLevels.filter( level => level === 2 )
+debugLevelThree = debugLevels.filter( level => level === 3 )
+
+if ( debugLevelOne[0] != undefined ){
+   console.log("\ndebug level 1")
+   console.log("serverMongo:", serverMongo)
+}
+
 
 ```
 
