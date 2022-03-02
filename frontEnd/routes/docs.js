@@ -59,8 +59,8 @@ debugLevelTwo   = debugLevels.filter( level => level === 2 )
 debugLevelThree = debugLevels.filter( level => level === 3 )
 
 if ( debugLevelOne[0] != undefined ){
-   console.log("\ndebug level 1")
-   console.log("serverMongo:", serverMongo)
+   wogger.debug( "\ndebug level 1" )
+   wogger.debug( "serverMongo:" + serverMongo )
 }
 
 // Inputs must be defined and nonblank

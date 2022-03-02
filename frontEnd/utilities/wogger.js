@@ -36,7 +36,7 @@ function instruction(cla) {
   var [ leftValue, rightValue ] = cla.split("=")
 
   switch(leftValue) {
-    case 'logformat':
+    case '--logformat':
       if ( rightValue === 'simple' ){
          requestedLogFormat  = winston.format.simple()
       }
@@ -46,7 +46,7 @@ function instruction(cla) {
       }
       break;
 
-    case 'loglevel':
+    case '--loglevel':
       requestedLogLevel = rightValue
       break;
   }//end switch

@@ -25,6 +25,9 @@ noder server.js --debuglevels=1
 noder server.js --debuglevels=1,2
 noder server.js --debuglevels=1,2,3
 
+
+# a combination of arguments
+node server.js --debuglevels=1 --loglevel=debug --logformat=simple
 ```
 
 ## Code Usage
@@ -36,7 +39,7 @@ noder server.js --debuglevels=1,2,3
 // wogger javascript syntax
 const wogger = require('../utilities/wogger.js');
 wogger.info( 'My message here' + aVariableHere )
-wogger.debug( 'A debugging message here' )
+wogger.debug( 'A debugging message here' + anthotherVar )
 
 ```
 
@@ -66,8 +69,8 @@ debugLevelTwo   = debugLevels.filter( level => level === 2 )
 debugLevelThree = debugLevels.filter( level => level === 3 )
 
 if ( debugLevelOne[0] != undefined ){
-   console.log("\ndebug level 1")
-   console.log("serverMongo:", serverMongo)
+   wogger.debug("\ndebug level 1")
+   wogger.debug("serverMongo:" + serverMongo)
 }
 
 
