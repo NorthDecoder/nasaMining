@@ -49,6 +49,14 @@ uname -or
   git clone --depth 1 --branch x.y.z https://github.com/NorthDecoder/nasaMining.git
   ```
 
+## Update project python modules
+
+```bash
+cd /nasaMining
+pip install -r requirements.txt
+```
+
+
 ## Update the project node modules
 
 ```bash
