@@ -1,14 +1,37 @@
+"""
+   # file: extract.py
+
+   > Original contributor: github.com/MattL920
+
+   ### usage:
+
+
+   ### Reference
+
+   1. ../readme.md
+   2. Topic modeling for humans[Gensim](https://radimrehurek.com/gensim)
+   3. Natural Language Toolkit [NLTK](https://nltk.org
+"""
+
 from __future__ import unicode_literals
 import json
 from gensim.models.phrases import Phrases
 from textblob import TextBlob
-import cPickle as pickle
+import nltk
+print(63*"*")
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('brown')
+print(63*"*")
+import pickle
 import argparse
-
+import logging
+logging.basicConfig(  level=logging.DEBUG )
+import time
 
 def parse_input(input_json, input_source=None):
-    print input_json, ': Tokenizing descriptions'
-
+    print( '\n', input_json, ': Tokenizing descriptions' )
+    print( '-------------------------------------------\n')
     desc = []
     doc_id = []
     dataset = json.load(open(input_json))['dataset']
@@ -29,9 +52,23 @@ def construct_ngrams(desc, desc_seed=None, phrase_passes=5, phrase_threshold=10,
     models = []
     desc_seed = desc_seed or []
 
-    print 'Constructing ngrams'
+    memory_intensive = "Function gensim Phrases is memory intensive \n" \
+                     + "and if it consumes all of the memory it will \n" \
+                     + "crash this script without warning.  \n"
+
+    problem_resolution = "View a pre-crash failure report with filprofiler. \n" \
+                       + "See https://pythonspeed.com/fil/docs/index.html. \n" \
+                       + "One possible way to eliminate the crashing is to \n" \
+                       + "set up virtual swap memory. Another, is to \n"\
+                       + "run the script on a server with more memory. \n" \
+                       + "Guess how much memory is needed? "
+
+    logging.warning( memory_intensive + problem_resolution + "\n")
+
+    print( '\nConstructing ngrams' )
+    print( '--------------------')
     for i in range(phrase_passes):
-        print '\t', i
+        print( '\t', "phrase_pass: ",i )
         model = Phrases(desc + desc_seed if i == 0 else desc, threshold=phrase_threshold)
         desc = model[desc]
         models.append(model)
@@ -45,7 +82,8 @@ def construct_ngrams(desc, desc_seed=None, phrase_passes=5, phrase_threshold=10,
 
 def extract(ngrams, dataset, doc_id):
     # extract keywords
-    print 'Extracting keywords'
+    print( '\nExtracting keywords' )
+    print( '-------------------')
     for i, ngram in enumerate(ngrams):
         doc = doc_id[i]
 
@@ -53,7 +91,7 @@ def extract(ngrams, dataset, doc_id):
             dataset[doc][field] = set()
 
             if doc > 0 and doc % 1000 == 0:
-                print '\t', doc
+                print( '\t', doc )
 
         for kw in filter(lambda k: '_' in k, ngram):
             keyword = kw.replace('_', ' ')
@@ -99,6 +137,7 @@ def kw_set_to_list(dataset):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     parser = argparse.ArgumentParser(description='SpaceTag keyword extraction')
     parser.add_argument('-i', "--input", type=str, default='data.json', help='path to a data.json format file')
     parser.add_argument('-s', "--source", type=str, default="", help='data source annotation (e.g. data.nasa.gov/data.json')
@@ -143,3 +182,8 @@ if __name__ == '__main__':
 
     with open(output_file, 'w') as f:
         json.dump(dataset, f)
+        print( '\nkeywords written to: ', output_file )
+
+    end_time = time.time()
+
+    print("in ", round( ( end_time - start_time )/60  , 2 )   , " minutes.")
