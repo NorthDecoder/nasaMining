@@ -1,99 +1,125 @@
-##
-# Reference:
-#  https://pymongo.readthedocs.io/en/stable/examples/tls.html#tls-ssl-and-pymongo
-#  https://docs.mongodb.com/drivers/pymongo/
+class Helper:
+    def __init__(self):
+        ''' Help for buildDB.py '''
 
-# Inputs:
-#  a `../data/nasa.json` file is expected to be available
-#  a `.env` file provided by devops in the current working directory
-#  a `./secrets/FILENAME_SSLCA` file contains the MongoDb secure socket
-#     layer certificate of authentication
+    def buildDB_help():
+        """
+         Inputs:
+          1. A `../data/nasa.json` file is expected to be available
+          2. A `.env` file provided by devops in the current working directory
+          3. A `./secrets/FILENAME_SSLCA` file contains the MongoDb secure socket
+             layer certificate of authentication
 
-# Result:
-#  The nasa.json data is loaded into the mongodb as a database named
-#  `jsonfromnasa`
+         Result:
+          1. The nasa.json data is loaded into the mongodb as a database named
+             `jsonfromnasa` into a collection named 'dataset'.  The script will
+             exit if an existing dataset already exists; it will not be
+             overwritten.
+          2. Logging is to the terminal
 
-# Usage:
-#  python3 buildDB.py verbose
-#  OR
-#  python3 buildDB.py quiet
-#  OR
-#  python3 buildDB.py        # defaults to verbose
+         Usage:
+          python3 buildDB.py help   # returns this message
+          OR
+          python3 buildDB.py development # verbose debugging messages
+          OR
+          python3 buildDB.py production  # information and warning messages only
+          OR
+          python3 buildDB.py        # defaults to production
+                                      with a message_verbocity of `quiet`
 
-#                     debug_level is `verbose` or `quiet`
 
-# make no user changes below here
 
+         Reference:
+          https://pymongo.readthedocs.io/en/stable/examples/tls.html#tls-ssl-and-pymongo
+          https://docs.mongodb.com/drivers/pymongo/
+        """
+
+#
+
+import authenticate_to_mongo #local module
 from pymongo import MongoClient
 import json
+import logging
 import os
 import sys
 from dotenv import load_dotenv
 load_dotenv()
 
+#
+
+msg_verbocity = ''
 
 if len(sys.argv) > 1:
-    debug_level = sys.argv[1]
+    environment  = sys.argv[1]
 else:
     # default to
-    debug_level = "verbose"
+    environment  = "production"
+
+
+if (environment == 'production' ):
+    logging.basicConfig( level=logging.INFO )
+    msg_verbocity = "quiet"
+
+elif (environment == 'development' ):
+    logging.basicConfig( level=logging.DEBUG )
+    msg_verbocity = "verbose"
+
+elif ( environment == 'help' ):
+    help( Helper.buildDB_help )
+    exit()
+
+else:
+    # defaults to same as productions
+    logging.basicConfig( level=logging.INFO )
+    msg_verbocity = "quiet"
+
+#
+
+logger = logging.getLogger(__name__)
+
+db = authenticate_to_mongo.db_jsonfromnasa( msg_verbocity )
+
 
 
 path_to_data = "../data/nasa.json"
-print("Loading data from", path_to_data , " ." )
+logger.info( "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ " )
+logger.info( "Loading data from" + path_to_data )
 data = json.load( open( path_to_data ) ) # returns a dictionary
 
-if (debug_level == "verbose"):
-    print( "  type(data)", type(data) )
-    print( "  data.keys():", data.keys() )
-
-# for MongoDB
-admin_name     = os.getenv('ADMIN_NAME')
-admin_password = os.getenv('ADMIN_PASSWORD')
-server_mongo   = os.getenv('SERVER_MONGO')   # server urls
-sslca          = os.getenv('FILENAME_SSLCA') # certificate
-full_path_sslca= "secrets/"+sslca
-
-print("\nEnvironment variables loaded.")
-if (debug_level == "verbose"):
-   print( "  admin_name: ",     admin_name )
-   print( "  admin_password: ", admin_password )
-   print( "  server_mongo: ",   server_mongo )
-   print( "  sslca: ",          sslca )
-   print( "  full_path_sslca: ",full_path_sslca )
-
-
-
-client = MongoClient(server_mongo,
-                              tls=True,
-                              tlsCAFile=full_path_sslca)
-
-if (debug_level == "verbose"):
+logger.debug( "type(data):"  + type(data).__name__ )
+logger.debug( data.keys() )
+'''
+if (msg_verbocity == "verbose"):
     try:
         print("\n  client.server_info():")
         print( client.server_info() )
     except Exception:
         print( "Unable to connect to the server." )
+'''
 
 
-# command insert requires authentication
-# note the `admin` database may be different in your install
-client.admin.authenticate( admin_name, admin_password )
-db=client.jsonfromnasa
+#
+if hasattr(db, 'dataset'):
+    logger.warning( "The 'dataset' collection already exists." )
+    logger.warning( "Exiting script '" + os.path.basename(__file__) +
+                    "' without adding new, or removing old data." )
+    exit()
 
-print("\n- - - - - - - - - - - - - - - - - - - - - - - - ")
-print("Building the database ...")
+#
+
+logger.info("- - - - - - - - - - - - - - - - - - - - - - - - ")
+logger.info("Building the database ...")
 record_count=0 # start at zero records
 
-print( "Thousands of records " )
+logger.info( "Thousands of records " )
 
 for d in data['dataset']:
-    if (debug_level == "verbose"):
+    if (msg_verbocity == "verbose"):
         if record_count < 1:# only print first record
-            print("Debug level 'verbose'; printng the first record for example: ")
-            print("- - - - - - - - - - - - - - - - - - - - - - - - ")
-            print(d,"\n")
-            print("- - - - - - - - - - - - - - - - - - - - - - - - ")
+            logger.debug("Debug level 'verbose'; printng the first record for example: ")
+            logger.debug("- - - - - - - - - - - - - - - - - - - - - - - - ")
+            logger.debug(d,"\n")
+            logger.debug("- - - - - - - - - - - - - - - - - - - - - - - - ")
 
     if record_count % 1000 == 0:
         # a dot for every thousand records
