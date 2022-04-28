@@ -17,9 +17,9 @@ uname -or
 
 * NodeJS
 * Git
-* Python 
+* Python
 
-## Download the application 
+## Download the application
 
 * From the default **develop** branch
 
@@ -107,31 +107,6 @@ sudo systemctl restart firewalld
 sudo firewall-cmd --list-services
 ```
 
-## Run the Express web page server 
-
-```bash
-cd nasaMining/frontEnd/
-node server.js
-```
-
-## View the web page in your browser at
-
-```
-put.your.servername.here:3000
-# or
-put.your.serverIP.here:3000
-```
-
-## Close the firewall 
-
-> When done with development tests and
-> server is no longer needed
-
-```bash
-sudo firewall-cmd --remove-port=3000/tcp --permanent
-sudo firewall-cmd --remove-service=http --permanent
-systemctl restart firewalld
-```
 
 ## * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 ## Mongo Work
@@ -141,14 +116,14 @@ systemctl restart firewalld
 ### Initialization
 
 ```bash
-# only once
-pip install pymongo[tls]  # secure connector for MongoDB
-pip install python-dotenv # access the .env file
-
 # if you want to update to the latest NASA data then,
 cd ~/nasaMining/data
 wget -O nasa.json "https://data.nasa.gov/data.json"
 ```
+If you want to inspect the json to understand its
+structure follow the
+[instructions](/inspecting-the-json-structure.md)
+
 ## Add environment variables file
 
 A `.env` file is expected to be created (by you) in
@@ -205,13 +180,42 @@ exit
 
 ```
 
-
-
 ```bash
 # build the database
 #
 cd ~/nasaMining/mongoWork
+python3 buildDB.py help
+#OR
 python3 buildDB.py
+```
+
+
+## Run the Express web page server
+
+```bash
+cd nasaMining/frontEnd/
+node server.js help
+# OR
+node server.js
+```
+
+## View the web page in your browser at
+
+```
+put.your.servername.here:3000
+# OR
+put.your.serverIP.here:3000
+```
+
+## Close the firewall
+
+> When done with development tests and
+> server is no longer needed
+
+```bash
+sudo firewall-cmd --remove-port=3000/tcp --permanent
+sudo firewall-cmd --remove-service=http --permanent
+systemctl restart firewalld
 ```
 
 
@@ -219,10 +223,11 @@ python3 buildDB.py
 ## Notes
 
 * It is not clear why there is Flask folder in the frontEnd/
-  directory.  Combining a Python app and 
+  directory.  Combining a Python app and
   a NodeJS app in the same project is confusing.
   TODO: Consider what is to become of that.
 
 ## Reference
 
 * [enable-and-disable-firewalld](https://firewalld.org/documentation/howto/enable-and-disable-firewalld.html)
+
