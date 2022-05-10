@@ -29,12 +29,12 @@ import logging
 logging.basicConfig(  level=logging.DEBUG )
 import time
 
-def parse_input(input_json, input_source=None):
-    print( '\n', input_json, ': Tokenizing descriptions' )
+def parse_input(path_to_input_json, input_source=None):
+    print( '\n', path_to_input_json, ': Tokenizing descriptions' )
     print( '-------------------------------------------\n')
     desc = []
     doc_id = []
-    dataset = json.load(open(input_json))['dataset']
+    dataset = json.load(open(path_to_input_json))['dataset']
 
     for i, ds in enumerate(dataset):
         if input_source:
@@ -150,7 +150,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    input_json = args.input
+    path_to_input_json = args.input
     input_source = args.source
     seed_json = args.seed
     output_file = args.output
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     phrase_passes = args.passes
     phrase_threshold = args.threshold
 
-    # input_json = 'data/defense.json'
+    # path_to_input_json = 'data/defense.json'
     # input_source = 'defense.gov/data.json'
     # seed_json = 'data/nasa.json'
     # output_file = 'data/defense_ngram_np2.json'
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     # phrase_threshold = 10
 
     # parse input data
-    dataset, desc, doc_id = parse_input(input_json, input_source)
+    dataset, desc, doc_id = parse_input(path_to_input_json, input_source)
 
     # parse secondary seed data
     desc_seed = []
