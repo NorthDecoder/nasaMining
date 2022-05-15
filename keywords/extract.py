@@ -1,18 +1,3 @@
-"""
-   # file: extract.py
-
-   > Original contributor: github.com/MattL920
-
-   ### usage:
-
-
-   ### Reference
-
-   1. ../readme.md
-   2. Topic modeling for humans[Gensim](https://radimrehurek.com/gensim)
-   3. Natural Language Toolkit [NLTK](https://nltk.org
-"""
-
 from __future__ import unicode_literals
 import json
 from gensim.models.phrases import Phrases
@@ -28,6 +13,96 @@ import argparse
 import logging
 logging.basicConfig(  level=logging.DEBUG )
 import time
+
+
+
+class Helper:
+    def __init__(self):
+        '''# Augmented help for extract.py '''
+
+    def extract_augmented_help():
+        """
+         >Original contributor:
+         >github.com/MattL920
+
+         ## Overview:
+         The script extract.py is user configurable by
+         command line arguments which determine
+         where to acquire the input data file, how many
+         keyword combinations to look for, the name of
+         the output field and the name and path of the
+         output data file.
+
+         The format of the json input file is expected
+         to be like:
+
+                    {[{},{},{}]}
+
+         Each object in the json array must have a
+         name `description`, like:
+
+         {[{"description":"x1"},
+           {"description":"x2"},
+           {"description":"x3"}]
+         }
+
+         The value of the description will be searched
+         for keywords, then turned into ngrams according
+         to the predefined quantity of keyword combinations.
+         The ngrams will be placed in the --field as defined
+         in the arguments.  Although the field name is
+         somewhat arbitrary, it is important to know when
+         accessing later with another script.
+
+
+         ## Inputs:
+         --input  "local path to the data"
+         --source "annotation that explains where the data came from"
+         --output "local path of the resulting file"
+         --field  "key name where the ngrams will be written in the json"
+         --passes "integer that determines the number of ngrams, defaults to 5"
+         --threshold "integer that determines the maximum level
+                      deep the output will be in the --field, defaults to 10"
+
+
+         ## Result:
+         The output stored in a file path defined by the --output
+         argument lookes something like:
+
+         {[{"description":"x1",
+            "ngram_keywords", "some ngrams here"
+           },
+           {"description":"x2",
+            "ngram_keywords", "some ngrams here"
+           },
+           {"description":"x3",
+            "ngram_keywords", "some ngrams here"
+           }
+          ]
+         }
+
+
+         ## Usage:
+          python3 extract.py -help   # returns simple help message
+          or
+          python3 extract.py -augmented_help   # returns extended help message
+          OR
+          > with data from NASA for example
+          python3 extract.py --input data/nasa.json \\
+                             --source data.nasa.gov/data.json \\
+                             --output data/nasa_keywords.json \\
+                             --field ngram_keywords \\
+                             --passes 5 \\
+                             --threshold 10 \\
+
+         Reference:
+         1. [ngrams](https://en.wikipedia.org/wiki/N-gram)
+         2. Topic modeling for humans [Gensim](https://radimrehurek.com/gensim)
+         3. Natural Language Toolkit [NLTK](https://nltk.org)
+         4. ../readme.md
+
+        """
+
 
 def parse_input(path_to_input_json, input_source=None):
     print( '\n', path_to_input_json, ': Tokenizing descriptions' )
@@ -147,6 +222,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', "--passes", type=int, default=5, help="number of phrase extraction passes to make")
     parser.add_argument('-t', "--threshold", type=int, default=10, help="phrase extraction significance threshold")
     parser.add_argument("--seed", type=str, default=None, help="path to a data.json to seed the phrase extraction statistics with")
+    parser.add_argument("--augmented_help", action='store_true', default="", help="Verbose help")
 
     args = parser.parse_args()
 
@@ -158,6 +234,11 @@ if __name__ == '__main__':
     field = args.field
     phrase_passes = args.passes
     phrase_threshold = args.threshold
+
+
+    if args.augmented_help:
+        help( Helper.extract_augmented_help )
+        exit()
 
     # path_to_input_json = 'data/defense.json'
     # input_source = 'defense.gov/data.json'
