@@ -88,9 +88,9 @@ class Helper:
           python3 extract.py -augmented_help   # returns extended help message
           OR
           > with data from NASA for example
-          python3 extract.py --input data/nasa.json \\
+          python3 extract.py --input ../data/nasa.json \\
                              --source data.nasa.gov/data.json \\
-                             --output data/nasa_keywords.json \\
+                             --output ../data/nasa_keywords.json \\
                              --field ngram_keywords \\
                              --passes 5 \\
                              --threshold 10 \\
@@ -105,7 +105,8 @@ class Helper:
 
 
 def parse_input(path_to_input_json, input_source=None):
-    print( '\n', path_to_input_json, ': Tokenizing descriptions' )
+    logging.info( path_to_input_json + ' : Tokenizing descriptions' )
+    logging.warning( "Depending upon processing power, tokenizing may take up to nine minutes to complete!")
     print( '-------------------------------------------\n')
     desc = []
     doc_id = []
@@ -217,7 +218,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', "--input", type=str, default='data.json', help='path to a data.json format file')
     parser.add_argument('-s', "--source", type=str, default="", help='data source annotation (e.g. data.nasa.gov/data.json')
     parser.add_argument('-o', "--output", type=str, default='keywords.json', help='path to output the data with extracted keywords')
-    parser.add_argument('-f', "--field", type=str, default='description_ngram_np', help='field in each dataset to store the keywords')
+    parser.add_argument('-f', "--field", type=str, default='ngram_keywords', help='field in each dataset to store the keywords')
     parser.add_argument('-m', "--model", type=str, default='models.pkl', help='file to save the pickled phrase extraction models')
     parser.add_argument('-p', "--passes", type=int, default=5, help="number of phrase extraction passes to make")
     parser.add_argument('-t', "--threshold", type=int, default=10, help="phrase extraction significance threshold")
