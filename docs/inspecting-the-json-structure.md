@@ -39,7 +39,7 @@ cat nasa.json | jq '.dataset' | jq '.[]' | jq '.keyword'
 
 ----
 
-## Understanding the structure of the nasa_keywords.json with new_keywords added
+## Understanding the structure of the nasa_keywords.json with ngram_keywords added
 
 After following the [readme](https://github.com/NorthDecoder/nasaMining/blob/develop/readme.md#keyword-extraction)
 instuctions and running the `keywords/extract.py` script look at the new
@@ -58,26 +58,26 @@ Try looking at all the records
 cat nasa_keywords.json | jq .
 ```
 
-> notice there is a new key `new_keywords` and values added to a copy of the
+> notice there is a new key `ngram_keywords` and values added to a copy of the
 > original 'nasa.json' file, in the file 'nasa_keywords.json'.
 
-Look at the new_keywords
+Look at the ngram_keywords
 
 ```bash
-cat nasa_keywords.json | jq '.[]' | jq '.new_keywords'
+cat nasa_keywords.json | jq '.[]' | jq '.ngram_keywords'
 ```
 
-Compare 'keyword' to 'new_keywords'
+Compare 'keyword' to 'ngram_keywords'
 
 ```bash
-cat nasa_keywords.json | jq -r '.[] | "\(.keyword) \(.new_keywords)"' | sed '/e/G'
+cat nasa_keywords.json | jq -r '.[] | "\(.keyword) \(.ngram_keywords)"' | sed '/e/G'
 ```
 
 Add the title, with newline after each data element, and space after 3 lines
 and only print the first hundred documents for reference.
 
 ```bash
-cat nasa_keywords.json | jq -r '.[] | "\(.title) \(.keyword) \(.new_keywords)"'\
+cat nasa_keywords.json | jq -r '.[] | "\(.title) \(.keyword) \(.ngram_keywords)"'\
                        | sed 's/\[/\n\[/g' | sed '0~3 a\\' | head -100
 ```
 
