@@ -59,26 +59,26 @@ debugLevelTwo   = debugLevels.filter( level => level === 2 )
 debugLevelThree = debugLevels.filter( level => level === 3 )
 
 if ( debugLevelOne[0] != undefined ){
-   wogger.debug( "\ndebug level 1" )
+   wogger.debug( "level 1" )
    wogger.debug( "serverMongo:" + serverMongo )
 }
 
 // Inputs must be defined and nonblank
 if ( (adminName === undefined) || (adminName === "") ){
-  console.log(`Error in ${__filename} . `, "Expecting variable ADMIN_NAME to be defined and not blank in the .env file." )
+  wogger.error(`Error in ${__filename} . `, "Expecting variable ADMIN_NAME to be defined and not blank in the .env file." )
   process.exit(1)
 }
 if ( (adminPassword === undefined) || (adminPassword === "") ){
-  console.log(`Error in ${__filename} . `, "Expecting variable ADMIN_PASSWORD to be defined in the .env file.")
+  wogger.error(`Error in ${__filename} . `, "Expecting variable ADMIN_PASSWORD to be defined in the .env file.")
     process.exit(1)
 }
 if ( (serverMongo === undefined) || (serverMongo === "") ){
-  console.log(`Error in ${__filename} . `, "Expecting variable SERVER_MONGO to be defined in the .env file.")
+  wogger.error(`Error in ${__filename} . `, "Expecting variable SERVER_MONGO to be defined in the .env file.")
   process.exit(1)
 }
 if( (filenameSSLCA === undefined) || (filenameSSLCA === "") ) {
 
-  console.log(`Error in ${__filename} . `, "Expecting variable FILENAME_SSLCA to be defined in the .env file.")
+  wogger.error(`Error in ${__filename} . `, "Expecting variable FILENAME_SSLCA to be defined in the .env file.")
   process.exit(1)
 }
 
@@ -97,8 +97,8 @@ var urlToMongo  = 'mongodb://'
                    + '&replicaSet=' + 'spacetags'
 
 if ( debugLevelTwo[0] != undefined ){
-   console.log("\ndebug level 2")
-   console.log( "urlToMongo:" + urlToMongo )
+   wogger.debug("level 2")
+   wogger.debug( "urlToMongo:" + urlToMongo )
 }
 
 const collections = ['datasets', 'keywords', 'kw_pair_freq', 'nasa_np_strengths_b', 'related_datasets']
@@ -110,24 +110,31 @@ const clientMongo = new MongoClient(urlToMongo, {
 	           useUnifiedTopology: true
                } )
 
-
 let db = null;
 
 async function dbConnect ( client, namedDataBase ) {
     return new Promise( ( resolve, reject ) => {
-        console.log( '\nCreating new connection to MongoDB server database name: ', namedDataBase )
+        wogger.info( 'Attempting connection to MongoDB database named: ' + namedDataBase )
         client.connect()
-        db = client.db( namedDataBase )
+        try {
+          db = client.db( namedDataBase )
+        } catch (error) {
+            wogger.info( "client.db error: " + error )
+            wogger.debug( "Carefully inspect the credentials you entered in the file nasaMining/frontend/.env" )
+            wogger.debug( "Make sure they match exactly those provided to the MongoDB host." )
+            wogger.debug( "Also check in the MongoDB host control panel to confirm the db is running." )
+            wogger.info( "Try: " + "node server.js --debuglevels=1,2,3 --loglevel=debug --logformat=simple" )
+        }
         process.on( 'exit', ( code ) => { client.close() } )
 
         if (db) {
-           console.log('\nConnected successfully to MongoDb server')
-	   console.log( "db.s.namespace:\n", db.s.namespace )
+           wogger.info('Connected successfully to MongoDb server')
+	   wogger.info( "db.s.namespace: " + db.s.namespace )
            resolve(db)
 	} else {
 	   reject( "In function dbConnect, \nconnection to MongoDb not successful." )
-	}
-
+           process.exit()
+        }
     });
 }// end function dbConnect
 
@@ -138,15 +145,15 @@ async function dbConnect ( client, namedDataBase ) {
 //test the connection
 dbConnect( clientMongo, dbName )
   .then( clientConnected => {
-         console.log("\nTest function dbConnect.")
-         console.log( "then clientConnected to:")
-         console.log( clientConnected.s.namespace )
+         wogger.debug("Test function dbConnect.")
+         wogger.debug( "then clientConnected to:")
+         wogger.debug( clientConnected.s.namespace )
          clientConnected.listCollections().toArray( function(err, names) {
 	     if(!err) {
-                 console.log("\nlistCollections() array:")
-	         console.log(names)
+                 wogger.debug("listCollections() array:")
+	         wogger.debug(names)
 	     } else {
-	         console.log("\nlistCollections() array error:", err)
+	         wogger.debug("listCollections() array error:", err)
 	     }
 	 });
   })
@@ -164,10 +171,10 @@ exports.getDatasets = function (req, res) {
     var query = req.query.q;
     var using = req.query.field;
     var field = (using == undefined) ? 'keyword' : using;
-    //console.log(field);
+    wogger.debug("In getDatasets, field: " + field);
     var theQuery = {};
     theQuery[field] = query;
-    //console.log(theQuery);
+    wogger.debug("theQuery: " + theQuery);
     var theFields = {
         'title': 1,
         'issued': 1,
@@ -263,7 +270,7 @@ exports.getEdges = function (req, res) {
 
 exports.getCoOccuringKWs = function (req, res) {
     var query = req.query.q;
-    console.log(query);
+    wogger.debug("In getCoOccuringKWs, query: " + query);
     var using = req.query.field;
     var field = (using == undefined) ? 'keyword' : using;
     var searches = {
@@ -345,7 +352,7 @@ exports.getCoOccuringKWsFlat_old = function (req, res) {
     var query = req.query.q;
     if ( (query === undefined) || (query === "") ){
       res.send({ 'error': 'you must pass in a query, of form q=' })
-      console.log( new Error("Expecting query to be defined and not blank") )
+      wogger.info( new Error("Expecting query to be defined and not blank") )
     }
     else {
         db.keywords.find(
@@ -388,24 +395,25 @@ exports.getCoOccuringKWsFlat_old = function (req, res) {
 //======================================================
 
 exports.getCoOccuringKWsFlat = function (req, res) {
-    console.log("\n===================================")
-    console.log("In function getCoOccuringKWsFlat")
+    wogger.debug("===================================")
+    wogger.debug("In function getCoOccuringKWsFlat")
     var query = req.query.q;
     if ( (query === undefined) || (query === "") ){
       res.send({ 'error': 'you must pass in a query, of form q=' })
-      console.log( new Error("Expecting query to be defined and not blank") )
+      wogger.debug( new Error("Expecting query to be defined and not blank") )
     } else {
-      console.log( "query: ", query )
+      wogger.debug( "query: ", query )
     }
 
     if (db){
-      console.log( "db.version is connected: ", db.version )
-    } else {
-      console.log( "db is not connected")
+      wogger.debug( "typeof(db): "+ typeof(db) )
+      wogger.debug( "Object.keys( db ): " + Object.keys( db ) + "\n")
+   } else {
+      wogger.debug( "db is not connected")
     }
 
-    console.log("End function getCoOccuringKWsFlat")
-    console.log("===================================")
+    wogger.debug("End function getCoOccuringKWsFlat")
+    wogger.debug("===================================")
     res.send( {result:"result"} )
 }
 //======================================================
