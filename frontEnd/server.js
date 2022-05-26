@@ -1,13 +1,24 @@
+/**
+ * file: server.js
+ *
+ *
+ * */
+
+const manuals = require('./utilities/manuals.js')
+const process = require('process');
+
+const commandLineArgs = process.argv.slice(2);
+console.log( "commandLineArgs", commandLineArgs );
+commandLineArgs.map( (argument) => manuals.instruction( argument ) );
+
 var express = require('express'),
 	docs = require('./routes/docs'),/*,
 	bodyParser = require('body-parser');*/
 	setImmediate = global.setImmediate;
 
-const process = require('process');
 const current_dir = process.cwd()
 const serverPort  = process.env.PORT || 3000 // web page server port
 const defaultAddress = process.env.SERVER_ADDRESS || "0.0.0.0" //default to all available
-
 
 var app = express();
 app.get('/', function (req, res) {

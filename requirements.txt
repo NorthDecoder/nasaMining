@@ -1,0 +1,13 @@
+# prerequisites to gensim
+numpy==1.22.3
+scipy==1.8.0
+#
+gensim==4.1.2
+#
+textblob==0.17.1
+
+# secure connector for MongoDB
+pymongo[tls]
+
+# access the .env file
+python-dotenv
