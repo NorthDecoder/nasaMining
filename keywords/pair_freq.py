@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 import argparse
 import json, operator
 from itertools import combinations
+import logging
+logging.basicConfig(  level=logging.DEBUG )
 from math import log
 
 #
@@ -31,11 +33,13 @@ class Helper:
         any dataset that is in the expected input
         format.  The default is to look for the
         nasaMining inputs, however the default
-        inputs can be changed to the desired input.
+        inputs can be changed to the desired input
+        with the arguments.
 
         ## Usage
 
-        python3 keywords/pair_freq.py \\
+        cd keywords
+        python3 pair_freq.py \\
                 --input ../data/nasa_keywords.json \\
                 --field ngram_keywords \\
                 --output ../data/nasa_np_strengths.json
@@ -45,6 +49,8 @@ class Helper:
         The format of the json input file is expected
         to be like:
                     {"dataset":[{},{},{}]}
+        OR
+                    [{},{},{}]
 
         Each object in the json array must have a
         name which can be identified by the argument
@@ -57,11 +63,13 @@ class Helper:
           {"ngram_keywords":["global","distribution","node"]}
         ]
 
+        Choose a field name that matches what you
+        are inspecting.
 
         ## Output
 
         The format of the json output file will be like
-        {[{},{},{}]}
+        [{},{},{}]
 
         Each object of the json array will have data something like
         {"count": 340.0,
@@ -121,7 +129,16 @@ if __name__ == '__main__':
     #
 
     data = json.load( open( path_to_input_json )  )
-    dataset = data['dataset']
+
+    try:
+        dataset = data['dataset']
+    except TypeError as e:
+        logging.info( "TypeError:")
+        logging.info( e )
+        logging.info("Hint: keyword name `dataset` is not available in the input,")
+        logging.info("attempting to access the list directly.")
+        dataset = data
+
     keyholder = {}
     outdata = []
 
@@ -132,10 +149,12 @@ if __name__ == '__main__':
 
     for i, ds in enumerate(dataset):
         for pair in combinations(ds[kw_field], 2):
-            sl_pair = sorted([x.lower() for x in pair], key=unicode.lower)
+
+            sl_pair = sorted( [x.lower() for x in pair], key=str.lower )
 
             if sl_pair[0] != sl_pair[1]:
-                # if there are projects with duplicate keywords in the metadata
+                # if there are projects with duplicate
+                # keywords in the metadata
 
                 key = str(sl_pair)
                 keyholder[key] = sl_pair
@@ -156,14 +175,19 @@ if __name__ == '__main__':
                 else:
                     single_words[sl_pair[1]] = 1
 
+    #
+
     for pair, count in sorted(pairs.items(), key=operator.itemgetter(1), reverse=True):
         cA = single_words[keyholder[pair][0]] # total count of the first word
         cB = single_words[keyholder[pair][1]] # total count of the second word
         cAB = float(count)
 
-        # if A and B only occur together once (this happens), then avoid a ZeroDivisionError.
-        #    if A and B individually each appear only 1 time, then this is significant (set to 1),
-        #    otherwise it is probably not significant at all (set to 0)
+        # If A and B only occur together once (this happens),
+        # then avoid a ZeroDivisionError.
+
+        # If A and B individually each appear only 1 time,
+        # then this is significant (set to 1),
+        # otherwise it is probably not significant at all (set to 0)
 
         if cAB == 1:
             if cA == 1 and cB == 1:
@@ -175,9 +199,21 @@ if __name__ == '__main__':
         else:
             dpmi = log((cAB * len(dataset)) / (cA * cB), 10) / -1 * log(cAB / len(dataset), 10)
             kpmi = log((cAB * len(single_words)) / (cA * cB), 10) / -1 * log(cAB / len(single_words), 10)
-        outdata.append({'keyword': keyholder[pair], 'count': cAB, 'a': cA, 'b': cB, 'pmi_doc': dpmi, 'pmi_kw': kpmi})
+        outdata.append({'keyword': keyholder[pair], \
+                          'count': cAB, \
+                              'a': cA, \
+                              'b': cB, \
+                        'pmi_doc': dpmi, \
+                         'pmi_kw': kpmi})
 
     with open( path_to_output_json, 'w' ) as f:
         json.dump(outdata, f)
 
-    print ( 'done' )
+    length_of_outdata_list = len( outdata  )
+
+    msg = "Saving " + str( length_of_outdata_list ) \
+                    + " records into a json array to file " \
+                    + path_to_output_json
+
+    logging.info( msg )
+
