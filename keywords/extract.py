@@ -70,13 +70,13 @@ class Helper:
          argument lookes something like:
 
          {[{"description":"x1",
-            "ngram_keywords", "some ngrams here"
+            "description_ngram_np", "some ngrams here"
            },
            {"description":"x2",
-            "ngram_keywords", "some ngrams here"
+            "description_ngram_np", "some ngrams here"
            },
            {"description":"x3",
-            "ngram_keywords", "some ngrams here"
+            "description_ngram_np", "some ngrams here"
            }
           ]
          }
@@ -91,7 +91,7 @@ class Helper:
           python3 extract.py --input ../data/nasa.json \\
                              --source data.nasa.gov/data.json \\
                              --output ../data/nasa_keywords.json \\
-                             --field ngram_keywords \\
+                             --field description_ngram_np \\
                              --passes 5 \\
                              --threshold 10 \\
 
@@ -218,7 +218,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', "--input", type=str, default='data.json', help='path to a data.json format file')
     parser.add_argument('-s', "--source", type=str, default="", help='data source annotation (e.g. data.nasa.gov/data.json')
     parser.add_argument('-o', "--output", type=str, default='keywords.json', help='path to output the data with extracted keywords')
-    parser.add_argument('-f', "--field", type=str, default='ngram_keywords', help='field in each dataset to store the keywords')
+    parser.add_argument('-f', "--field", type=str, default='description_ngram_np', help='field in each dataset to store the keywords')
     parser.add_argument('-m', "--model", type=str, default='models.pkl', help='file to save the pickled phrase extraction models')
     parser.add_argument('-p', "--passes", type=int, default=5, help="number of phrase extraction passes to make")
     parser.add_argument('-t', "--threshold", type=int, default=10, help="phrase extraction significance threshold")
