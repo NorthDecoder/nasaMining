@@ -28,7 +28,8 @@ class Helper:
 
          ## Inputs:
 
-          1. A `.env` file provided by devops in the current working directory
+          1. A `.env` file provided by devops in the current working directory.
+             see ../docs/installation.md#add-environment-variables-file-1
           2. A `./secrets/FILENAME_SSLCA` file contains the MongoDb secure socket
              layer certificate of authentication
           3. Command line
@@ -174,24 +175,42 @@ elif(type(data).__name__ == "list"):
 
 
 #
-if hasattr(db, 'dataset') and (force_delete=='no'):
-    logger.warning( "The 'dataset' collection already exists in the mongoDB." )
+if hasattr(db, collection_name ) and (force_delete=='no'):
+    logger.warning( "The '"+ collection_name + "' collection already exists in the mongoDB." )
     logger.warning( "Exiting script '" + os.path.basename(__file__) +
                     "' without adding new, or removing old data." )
     logger.warning( "If you truly wish to delete the existing collection, " )
     logger.warning( "add command line argument --force_delete yes" )
 
+    collection_document_count = db[collection_name].count_documents({})
+
+    logger.info( "Collection '" + collection_name + "' in mongoDB contains "
+                 + str( collection_document_count ) + " documents."  )
     exit()
+
+
+if hasattr(db, collection_name ):
+    if (force_delete=='yes'):
+        logger.info("Since --force_delete is yes, collection '"
+                        + collection_name + "'")
+        logger.info("will be dropped from mongoDB")
+
+        drop_result = db.drop_collection( collection_name )
+
+        if drop_result is not None:
+            logger.info( "Collection '" + collection_name +
+                         "' drop_result: " + str( drop_result ) )
+
+        elif drop_result is None:
+            logger.info( "Collection '" + collection_name + "' drop_result: " + "failed..." )
+            exit()
 
 #
 
 logger.info("- - - - - - - - - - - - - - - - - - - - - - - - ")
-logger.info("Building the database ...")
+logger.info("Writing thousands of documents to the mongoDB collection " + collection_name)
 record_count=0 # start at zero records
 
-logger.info( "Thousands of records " )
-
-#for d in data['dataset']:
 for d in data_list:
     if (msg_verbocity == "verbose"):
         if record_count < 1:# only print first record
@@ -205,11 +224,16 @@ for d in data_list:
         sys.stdout.write(".")
         sys.stdout.flush()
 
-    db.datasets.insert_one(d)
+    db[collection_name].insert_one(d)
     record_count += 1
 
-print("\nBuild completed with", record_count, "records.")
+collection_document_count = db[collection_name].count_documents({})
+
+
 
 end_time = time.time()
-print("in ", round( ( end_time - start_time )/60  , 2 )   , " minutes.")
+
+logger.info("Build copied " + str(record_count) + " documents")
+logger.info("in " + str( round( ( end_time - start_time )/60  , 2 ) )  + " minutes.")
+logger.info( "Collection '" + collection_name + "' now contains " + str( collection_document_count ) + " documents")
 
