@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import logging
 import os
+from pathlib import Path
 from pymongo import MongoClient
 
 logger = logging.getLogger(__name__)
@@ -34,7 +35,14 @@ def db_jsonfromnasa( verbocity = 'quiet' ):
     admin_password = os.getenv('ADMIN_PASSWORD')
     server_mongo   = os.getenv('SERVER_MONGO')   # server urls
     sslca          = os.getenv('FILENAME_SSLCA') # certificate
-    full_path_sslca= "secrets/"+sslca
+    relative_path_sslca= "secrets/"+sslca
+
+
+    parent_directory = str( Path(__file__).parent )
+    absolute_path_object_to_sslca = Path( os.path.join( parent_directory, relative_path_sslca ) )
+    absolute_path_to_sslca_string = str( absolute_path_object_to_sslca.resolve() )
+
+
 
 
     logger.info("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~")
@@ -45,17 +53,17 @@ def db_jsonfromnasa( verbocity = 'quiet' ):
         logger.debug( "  admin_password: %s", admin_password )
         logger.debug( "  server_mongo: %s",   server_mongo )
         logger.debug( "  sslca: %s",          sslca )
-        logger.debug( "  full_path_sslca: %s",full_path_sslca )
+        #logger.debug( "  full_path_sslca: %s",full_path_sslca )
+        logger.debug( "  :absolute_path_to_sslca_string %s", absolute_path_to_sslca_string )
 
 
     client = MongoClient( server_mongo,
                                   tls=True,
-                                  tlsCAFile=full_path_sslca )
+                                  tlsCAFile=absolute_path_to_sslca_string )
     if ( verbocity == "verbose"):
         logger.debug(  "  client: %s", client )
 
     client.admin.authenticate( admin_name, admin_password )
 
     return client.jsonfromnasa
-
 
