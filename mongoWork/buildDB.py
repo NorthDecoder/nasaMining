@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 class Helper:
     def __init__(self):
         ''' Help for buildDB.py '''
@@ -87,6 +89,15 @@ class Helper:
                              --keyname yet_another_dataset \\
                              --collection_name keywords \\
                              --force_delete yes
+          OR
+
+          * an example to be run by unittest
+
+          python3 buildDB.py --inpath ../test/data/list_10_documents.json \\
+                             --environment development \\
+                             --keyname dataset \\
+                             --collection_name list_10 \\
+                             --force_delete yes
 
          Reference:
           https://pymongo.readthedocs.io/en/stable/examples/tls.html#tls-ssl-and-pymongo
@@ -101,6 +112,7 @@ from pymongo import MongoClient
 import json
 import logging
 import os
+from pathlib import Path
 import sys
 from dotenv import load_dotenv
 load_dotenv()
@@ -116,12 +128,12 @@ parser.add_argument('-c', "--collection_name", type=str, default='dataset', help
 parser.add_argument('-f', "--force_delete", type=str, default='no', help='force delete allows replacing an entire collection in mongoDB, yes OR no, defaults to no')
 parser.add_argument("--augmented_help", action='store_true', default="", help="Verbose help")
 
-args               = parser.parse_args()
-path_to_input_json = args.inpath
-environment        = args.environment
-keyname            = args.keyname
-collection_name    = args.collection_name
-force_delete       = args.force_delete
+args                        = parser.parse_args()
+relative_path_to_input_json = args.inpath
+environment                 = args.environment
+keyname                     = args.keyname
+collection_name             = args.collection_name
+force_delete                = args.force_delete
 
 if args.augmented_help:
     help( Helper.buildDB_augmented_help )
@@ -155,11 +167,32 @@ logger = logging.getLogger(__name__)
 
 db = authenticate_to_mongo.db_jsonfromnasa( msg_verbocity )
 
+logger.debug( "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ " )
+logger.debug( "Script: " + str( Path(__file__).name ) )
+
+# In order to run the script from a location other than at the
+# script location, while running unittest for example, need to
+# translate relative into an absolute path.
+
+# relative path in reference to script location in directory structure
+# for example this script in     ~/nasaMining/mongoWork/buildDB.py
+# relative path for data in                ../data/nasa_keywords.json
+# parent_directory    /home/myname/nasaMining/mongoWork
+# resolved absolute path to input json string
+#                     /home/myname/nasaMining/data/nasa_keywords.json
+
+parent_directory = str( Path(__file__).parent )
+absolute_path_object_to_input_json= Path( os.path.join( parent_directory, relative_path_to_input_json ) )
+absolute_path_to_input_json_string = str( absolute_path_object_to_input_json.resolve() )
+
+logger.debug( "script parent directory: " + parent_directory )
+logger.debug( "absolute_path_to_input_json_string: " + absolute_path_to_input_json_string )
+
 
 
 logger.info( "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ " )
-logger.info( "Loading data from " + path_to_input_json )
-data = json.load( open( path_to_input_json ) )
+logger.info( "Loading data from " + absolute_path_to_input_json_string )
+data = json.load( open( absolute_path_to_input_json_string ) )
 
 logger.debug( "type(data).__name__: "  + type(data).__name__ )
 
@@ -168,6 +201,7 @@ if ( type(data).__name__ == "dict" ):
     data_list = data['dataset']
 elif(type(data).__name__ == "list"):
     data_list = data
+
 
 
 
@@ -216,7 +250,7 @@ for d in data_list:
         if record_count < 1:# only print first record
             logger.debug("Debug level 'verbose'; printng the first record for example: ")
             logger.debug("- - - - - - - - - - - - - - - - - - - - - - - - ")
-            logger.debug(d,"\n")
+            logger.debug( d )
             logger.debug("- - - - - - - - - - - - - - - - - - - - - - - - ")
 
     if record_count % 1000 == 0:
@@ -226,6 +260,8 @@ for d in data_list:
 
     db[collection_name].insert_one(d)
     record_count += 1
+
+print( "" ) # a newline after all the dots
 
 collection_document_count = db[collection_name].count_documents({})
 
