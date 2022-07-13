@@ -1,4 +1,4 @@
-# Inspecing the structure of nasa.json
+# Inspecting the structure of nasa.json
 
 Prepare the updated `nasa.json` as noted in the MongoWork
 [initialization](https://github.com/NorthDecoder/nasaMining/blob/develop/docs/installation.md#initialization)
@@ -83,6 +83,12 @@ cat nasa_keywords.json | jq -r '.[] | "\(.title) \(.keyword) \(.ngram_keywords)"
 
 > Eventually this has a little flaw. If the title has an start bracket `[`
 > the new line created by sed will throw the three line spacing count off?
+
+Get the first ten documents in a json list.
+
+```bash
+jq .[0:10] ../data/nasa_keywords.json
+```
 
 That should be enough exploration to help with understanding what is in the file
 'nasa_keywords.json' .
