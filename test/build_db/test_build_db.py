@@ -63,9 +63,35 @@ class TestSaveJsonToDB( unittest.TestCase ):
                                  "--force_delete","yes"],
                                  capture_output=True  )
 
-       # not sure why the result is in stderr, just rolling with it for now
+        # not sure why the result is in stderr, just rolling with it for now
         self.assertTrue( b"'list_10' now contains 10 documents"
-                         in built_list_10.stderr, "Expecting part of the successful load message" )
+                         in built_list_10.stderr,
+                         "Expecting part of the successful load message" )
+
+    #
+
+    def test_loaded_dict(self):
+
+
+        built_dict_10 = subprocess.run( [absolute_path_to_sut,
+                                 "--inpath", "../test/data/dict_10_documents.json",
+                                 "--environment", "production",
+                                 "--keyname", "dataset",
+                                 "--collection_name",  "list_10",
+                                 "--force_delete","yes"],
+                                 capture_output=True  )
+
+        # not sure why the result is in stderr, just rolling with it for now
+        self.assertTrue( b"'list_10' now contains 10 documents"
+                         in built_dict_10.stderr,
+                         "Expecting part of the successful load message" )
+
+
+
+
+
+
+
 
 
 
