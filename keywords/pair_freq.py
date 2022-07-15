@@ -130,14 +130,15 @@ if __name__ == '__main__':
 
     data = json.load( open( path_to_input_json )  )
 
-    try:
+    if ( type(data).__name__ == "dict" ):
+        logger.debug( data.keys() )
         dataset = data['dataset']
-    except TypeError as e:
-        logging.info( "TypeError:")
-        logging.info( e )
-        logging.info("Hint: keyword name `dataset` is not available in the input,")
-        logging.info("attempting to access the list directly.")
+    elif(type(data).__name__ == "list"):
         dataset = data
+    else:
+        logging.info("For input json Was expecting type(data) to be dict or list.")
+        logging.info("See `python3 pair_freq.py --augmented_help` for details.")
+        exit()
 
     keyholder = {}
     outdata = []
