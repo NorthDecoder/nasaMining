@@ -41,7 +41,7 @@ class Helper:
         cd keywords
         python3 pair_freq.py \\
                 --input ../data/nasa_keywords.json \\
-                --field ngram_keywords \\
+                --field description_ngram_np \\
                 --output ../data/nasa_np_strengths.json
 
         ## Inputs
@@ -56,11 +56,11 @@ class Helper:
         name which can be identified by the argument
         something like:
 
-        --field ngram_keywords
+        --field description_ngram_np
 
-        [ {"ngram_keywords":["real-time","sea surface","temperature"]},
-          {"ngram_keywords":["foundation","sea surface","temperature"]},
-          {"ngram_keywords":["global","distribution","node"]}
+        [ {"description_ngram_np":["real-time","sea surface","temperature"]},
+          {"description_ngram_np":["foundation","sea surface","temperature"]},
+          {"description_ngram_np":["global","distribution","node"]}
         ]
 
         Choose a field name that matches what you
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', "--input", type=str, default='../data/nasa_keywords.json', \
                          help='path to a data.json format file containing keyword ngrams')
 
-    parser.add_argument('-f', "--field", type=str, default='ngram_keywords', \
+    parser.add_argument('-f', "--field", type=str, default='description_ngram_np', \
                          help='field in the dataset in which to find the keywords')
 
     parser.add_argument('-o', "--output", type=str, default='../data/nasa_np_strengths.json', \
@@ -130,14 +130,15 @@ if __name__ == '__main__':
 
     data = json.load( open( path_to_input_json )  )
 
-    try:
+    if ( type(data).__name__ == "dict" ):
+        logger.debug( data.keys() )
         dataset = data['dataset']
-    except TypeError as e:
-        logging.info( "TypeError:")
-        logging.info( e )
-        logging.info("Hint: keyword name `dataset` is not available in the input,")
-        logging.info("attempting to access the list directly.")
+    elif(type(data).__name__ == "list"):
         dataset = data
+    else:
+        logging.info("For input json Was expecting type(data) to be dict or list.")
+        logging.info("See `python3 pair_freq.py --augmented_help` for details.")
+        exit()
 
     keyholder = {}
     outdata = []
