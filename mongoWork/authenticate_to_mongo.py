@@ -8,8 +8,8 @@ from pymongo import MongoClient
 logger = logging.getLogger(__name__)
 
 
-def db_jsonfromnasa( verbocity = 'quiet' ):
-    '''function name: db_jsonfromnasa
+def db_json_from_agency( verbocity = 'quiet' ):
+    '''function name: db_json_from_agency
 
     To keep other scripts DRY, include this function to access
     the mongoDB with an authenticated client.
@@ -26,7 +26,7 @@ def db_jsonfromnasa( verbocity = 'quiet' ):
 
         Usage:
             import authenticate_to_mongo
-            db = authenticate_to_mongo.db_jsonfromnasa()
+            db = authenticate_to_mongo.db_json_from_agency()
 
             db.datasets. { some mongo command here }
     '''
@@ -65,5 +65,5 @@ def db_jsonfromnasa( verbocity = 'quiet' ):
 
     client.admin.authenticate( admin_name, admin_password )
 
-    return client.jsonfromnasa
+    return client.json_from_agency
 
