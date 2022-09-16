@@ -165,7 +165,7 @@ else:
 
 logger = logging.getLogger(__name__)
 
-db = authenticate_to_mongo.db_jsonfromnasa( msg_verbocity )
+db = authenticate_to_mongo.db_json_from_agency( msg_verbocity )
 
 logger.debug( "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ " )
 logger.debug( "Script: " + str( Path(__file__).name ) )
