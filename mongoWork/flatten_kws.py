@@ -1,11 +1,11 @@
-import pymongo
-from pymongo import MongoClient
+import authenticate_to_mongo #local module
 
-client = MongoClient('proximus.modulusmongo.net:27017')
-client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
-db = client.tepO9seb
+msg_verbocity = 'verbose'
+db = authenticate_to_mongo.db_json_from_agency( msg_verbocity )
 
+# description_ngram_np
 if __name__ == '__main__':
+    # res = db.datasets.find({}, {"_id": 0, "identifier": 1, "title": 1, "source": 1, "description_ngram_np": 1})
     res = db.datasets.find({}, {"_id": 0, "identifier": 1, "title": 1, "source": 1, "description_ngram_np": 1})
 
     keywords = []
@@ -28,3 +28,4 @@ if __name__ == '__main__':
         ("keyword", pymongo.ASCENDING),
         ("source", pymongo.ASCENDING)
     ], background=True)
+
