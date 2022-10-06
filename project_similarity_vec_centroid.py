@@ -1,3 +1,4 @@
+import authenticate_to_mongo #local module
 from collections import defaultdict
 from pymongo import MongoClient
 import pandas as pd

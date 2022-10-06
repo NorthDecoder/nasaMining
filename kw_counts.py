@@ -1,3 +1,4 @@
+import authenticate_to_mongo #local module
 from __future__ import unicode_literals
 import json
 from pymongo import MongoClient

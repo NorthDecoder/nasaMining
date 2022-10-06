@@ -1,3 +1,4 @@
+import authenticate_to_mongo #local module
 import json
 from pymongo import MongoClient
 

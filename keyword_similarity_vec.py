@@ -1,3 +1,4 @@
+import authenticate_to_mongo #local module
 from pymongo import MongoClient
 from spacy.en import English
 import pandas as pd
