@@ -1,4 +1,6 @@
-from pymongo import MongoClient
+import authenticate_to_mongo #local module
+
+
 from spacy.en import English
 import pandas as pd
 import numpy as np
@@ -6,9 +8,9 @@ from scipy.spatial.distance import pdist, squareform
 
 
 if __name__ == '__main__':
-    client = MongoClient('proximus.modulusmongo.net:27017')
-    client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
-    db = client.tepO9seb
+
+
+    db = authenticate_to_mongo.db_json_from_agency()
 
     res = db.datasets.find({}, {"_id": 0, "description_ngram_np": 1})
 

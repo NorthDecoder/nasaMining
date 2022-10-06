@@ -1,9 +1,11 @@
-from pymongo import MongoClient
+import authenticate_to_mongo #local module
+
+
 import json
 
-client = MongoClient('proximus.modulusmongo.net:27017')
-client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
-db = client.tepO9seb
+
+
+db = authenticate_to_mongo.db_json_from_agency()
 
 if __name__ == '__main__':
     data = json.load(open('data/usda_ngram_np.json'))

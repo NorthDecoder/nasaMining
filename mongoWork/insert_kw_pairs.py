@@ -1,9 +1,12 @@
-from pymongo import MongoClient
+import authenticate_to_mongo #local module
+
+
 import json
 
 # insert the databases around bigram, pair, and textrank frequencies
 client=MongoClient('proximus.modulusmongo.net:27017')
-client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
+
+
 db=client.tepO9seb
 
 #data=json.load(open("/Users/Jon/Code/DataKind/GlobalGiving/nasaMining/data/keyword_pair_freq.json"))
