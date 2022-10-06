@@ -18,7 +18,7 @@ data=json.load(open("/Users/Jon/Code/DataKind/GlobalGiving/nasaMining/data/nasa_
 counter=0
 for d in data:
 	if counter%100==0:
-		print "Done {} of {}".format(counter,len(data))
+		print("Done {} of {}".format(counter,len(data)))
 	counter+=1
 	if counter<169280:
 		continue

@@ -34,7 +34,7 @@ if __name__ == '__main__':
     print( type(s) )
 
     print ( "type(f):" )
-    print ( type(f) )
+    print( type(f) )
     f.close()
 
     data_list = json.loads( s )

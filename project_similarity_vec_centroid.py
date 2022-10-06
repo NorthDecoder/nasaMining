@@ -34,7 +34,7 @@ if __name__ == '__main__':
     kw_vec = pd.read_pickle('keyword_vec_repr.pkl')
 
     # collect project vectors
-    print "Collecting project vectors"
+    print("Collecting project vectors")
     projects = dict()
     # project_urls = dict()
 
@@ -45,13 +45,13 @@ if __name__ == '__main__':
     # projects = {r["identifier"]: kw_vec.ix[r["description_ngram_np"]] for r in res}
 
     # filter projects without keywords
-    projects = {k: v for k, v in projects.iteritems() if len(v)}
+    projects = {k: v for k, v in projects.items() if len(v)}
 
     # take the centroid of each embedding dimension
-    centroids = np.row_stack([np.mean(v) for v in projects.values()])
+    centroids = np.row_stack([np.mean(v) for v in list(projects.values())])
 
     dist = squareform(pdist(centroids, 'cosine'))
-    sim_df = pd.DataFrame(1. - dist, index=projects.keys(), columns=projects.keys())
+    sim_df = pd.DataFrame(1. - dist, index=list(projects.keys()), columns=list(projects.keys()))
     sim_df.fillna(0.0, inplace=True)
 
     sim_df.to_pickle('keyword_vec_centroid_sims.pkl')
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     recs = []
     for i, sims in sim_df.iterrows():
         r = sims.sort(inplace=False, ascending=False).head(25)
-        recs += [{'identifier': i, 'rec': ri, 'sim': rs} for ri, rs in r.to_dict().items() if ri != i]
+        recs += [{'identifier': i, 'rec': ri, 'sim': rs} for ri, rs in list(r.to_dict().items()) if ri != i]
 
     db.related_datasets.insert(recs)
     db.related_datasets.create_index('identifier', background=True)

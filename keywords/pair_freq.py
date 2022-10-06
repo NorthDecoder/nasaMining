@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 import argparse
 import json, operator
 from itertools import combinations
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     data = json.load( open( path_to_input_json )  )
 
     if ( type(data).__name__ == "dict" ):
-        logger.debug( data.keys() )
+        logger.debug( list(data.keys()) )
         dataset = data['dataset']
     elif(type(data).__name__ == "list"):
         dataset = data
@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
     #
 
-    for pair, count in sorted(pairs.items(), key=operator.itemgetter(1), reverse=True):
+    for pair, count in sorted(list(pairs.items()), key=operator.itemgetter(1), reverse=True):
         cA = single_words[keyholder[pair][0]] # total count of the first word
         cB = single_words[keyholder[pair][1]] # total count of the second word
         cAB = float(count)

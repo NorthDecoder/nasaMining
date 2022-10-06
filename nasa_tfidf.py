@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 import json
 import os
 from textblob import TextBlob
@@ -33,4 +33,4 @@ if __name__ == '__main__':
         tfidf = TfidfModel(corpus, dictionary=corpus.dictionary)
         tfidf.save('tfidf.pkl')
 
-    print score('project completed', tfidf=tfidf, dictionary=dictionary)
+    print(score('project completed', tfidf=tfidf, dictionary=dictionary))

@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 import json, operator
 from itertools import combinations
 from gensim.models.tfidfmodel import TfidfModel
@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     dictionary = corpora.Dictionary(texts)
     dictionary.save('/dicts/nasa.dict')
-    print dictionary
+    print(dictionary)
     
     corpus = [dictionary.doc2bow(text) for text in texts]
     corpora.MmCorpus.serialize('/dicts/nasa.mm', corpus)
@@ -36,4 +36,4 @@ if __name__ == '__main__':
 #     print(tfidf['atmosphere'])
 #     
         
-    print'done'
+    print('done')

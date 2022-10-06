@@ -15,7 +15,7 @@ if __name__ == '__main__':
     nlp = English()
 
     # get all unique keywords and their (additive) vector representation
-    print 'Vectorizing unique keywords'
+    print('Vectorizing unique keywords')
     keywords = dict()
     for r in res:
         for kw in r["description_ngram_np"]:
@@ -24,12 +24,12 @@ if __name__ == '__main__':
     kw_vec = pd.DataFrame.from_dict(keywords).T
     kw_vec.to_pickle('keyword_vec_repr.pkl')
 
-    keys = keywords.keys()
+    keys = list(keywords.keys())
 
     # calculate cosine similarity
-    print 'Calculating similarities'
-    similarity = 1. - squareform(pdist(np.array(keywords.values()), 'cosine'))
-    similarity = pd.DataFrame(1. - squareform(pdist(np.array(keywords.values()), 'cosine')), index=keys, columns=keys)
+    print('Calculating similarities')
+    similarity = 1. - squareform(pdist(np.array(list(keywords.values())), 'cosine'))
+    similarity = pd.DataFrame(1. - squareform(pdist(np.array(list(keywords.values())), 'cosine')), index=keys, columns=keys)
 
     keys = sorted(keys)
 

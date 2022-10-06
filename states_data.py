@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 import requests
 import json
 
@@ -19,47 +19,47 @@ if __name__ == '__main__':
     for state in states:
         s = state.lower().replace(' ', '')
         url = 'http://data.%s.gov/data.json' % s
-        print url
+        print(url)
 
         try:
             res = requests.get(url)
 
             data = res.json()
 
-            print "'%s': '%s'," % (s, url)
+            print("'%s': '%s'," % (s, url))
 
             with open('data/%s.json' % s, 'w') as f:
                 json.dump(data, f)
         except:
-            print '\tError'
+            print('\tError')
 
             url = 'http://www.%s.gov/data.json' % s
-            print url
+            print(url)
             try:
                 res = requests.get(url)
 
                 data = res.json()
 
-                print "'%s': '%s'," % (s, url)
+                print("'%s': '%s'," % (s, url))
 
                 with open('data/%s.json' % s, 'w') as f:
                     json.dump(data, f)
             except:
-                print '\tError'
+                print('\tError')
 
                 if ' ' in state:
                     s = ''.join([s_[0] for s_ in state.split()]).lower()
                     url = 'http://data.%s.gov/data.json' % s
-                    print url
+                    print(url)
 
                     try:
                         res = requests.get(url)
                         data = res.json()
 
-                        print "'%s': '%s'," % (s, url)
+                        print("'%s': '%s'," % (s, url))
 
                         with open('data/%s.json' % s, 'w') as f:
                             json.dump(data, f)
                     except:
-                        print '\tError'
+                        print('\tError')
                         pass

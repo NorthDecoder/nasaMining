@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 import json
 from gensim.models.phrases import Phrases
 from textblob import TextBlob
@@ -169,7 +169,7 @@ def extract(ngrams, dataset, doc_id):
             if doc > 0 and doc % 1000 == 0:
                 print( '\t', doc )
 
-        for kw in filter(lambda k: '_' in k, ngram):
+        for kw in [k for k in ngram if '_' in k]:
             keyword = kw.replace('_', ' ')
 
             kw_tb = TextBlob(keyword)

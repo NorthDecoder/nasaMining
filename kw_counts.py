@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 import json
 from pymongo import MongoClient
 from collections import Counter, defaultdict
@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     for i, kwds in enumerate(db.datasets.find({}, {'_id': 0, 'description_ngram_np': 1, 'source': 1})):
         if i and i % 1000 == 0:
-            print i
+            print(i)
 
         counts[kwds['source']].update(kwds['description_ngram_np'])
 
@@ -23,10 +23,10 @@ if __name__ == '__main__':
 
     # collocs = dict(sorted(collocs.items(), key=lambda c: len(c)))
 
-    collocs = {k: sorted([(v1, list(v2)) for v1, v2 in v.items()], key=lambda v_: len(v_[1]), reverse=True)
-               for k, v in collocs.iteritems()}
+    collocs = {k: sorted([(v1, list(v2)) for v1, v2 in list(v.items())], key=lambda v_: len(v_[1]), reverse=True)
+               for k, v in collocs.items()}
 
     json.dump(counts, open('kw_counts.json', 'w'))
     json.dump(collocs, open('kw_collocations.json', 'w'))
 
-    print 'Done'
+    print('Done')

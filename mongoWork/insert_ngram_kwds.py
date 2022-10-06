@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     for i, d in enumerate(data):
         if i and i % 100 == 0:
-            print i
+            print(i)
 
         db.datasets.update({'identifier': d['identifier']}, {'$set': {
             'description_ngram_np': d['gensim_ngram_np']

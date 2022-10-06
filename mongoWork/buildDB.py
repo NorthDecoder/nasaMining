@@ -197,7 +197,7 @@ data = json.load( open( absolute_path_to_input_json_string ) )
 logger.debug( "type(data).__name__: "  + type(data).__name__ )
 
 if ( type(data).__name__ == "dict" ):
-    logger.debug( data.keys() )
+    logger.debug( list(data.keys()) )
     data_list = data['dataset']
 elif(type(data).__name__ == "list"):
     data_list = data

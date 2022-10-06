@@ -15,7 +15,7 @@ if __name__ == '__main__':
     # setup sim score hash
     for i, ds in enumerate(sim_data):
         pair = ds['keyword']
-        sl_pair = str(sorted([x.lower() for x in pair], key=unicode.lower))
+        sl_pair = str(sorted([x.lower() for x in pair], key=str.lower))
         sim_scores[sl_pair] = ds['score']
         
     # calculate similarity between projects
@@ -43,5 +43,5 @@ if __name__ == '__main__':
         with open(outfile, 'w') as f:
             json.dump(sorted(proj_sims, key=operator.itemgetter('score'), reverse=True), f)
 
-    print 'done'
+    print('done')
     

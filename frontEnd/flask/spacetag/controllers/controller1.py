@@ -6,8 +6,8 @@ from collections import Counter
 from flask import request, render_template, make_response
 
 from time import time
-import httplib
-import urllib
+import http.client
+import urllib.request, urllib.parse, urllib.error
 import json
 import re
 import pymongo
@@ -53,7 +53,7 @@ def getCoOccuringKWsFlat():
     for result in results:
         keywords.update(result['keywords_full'])
 
-    results = sorted([{'kw': k, 'count': v} for k, v in keywords.iteritems()], key=lambda kw: kw['count'], reverse=True)
+    results = sorted([{'kw': k, 'count': v} for k, v in keywords.items()], key=lambda kw: kw['count'], reverse=True)
 
     response = make_response(json.dumps(results))
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -148,7 +148,7 @@ def getCoOccuringKWsGraph():
 
     min_count = keywords.most_common(1)[0][1] / 2.
 
-    keywords = [k[0] for k in keywords.iteritems() if k[1] >= min_count]
+    keywords = [k[0] for k in keywords.items() if k[1] >= min_count]
 
     results = db.nasa_np_strengths_b.find(
         {'keyword': {"$in": keywords}, 'count': {'$gt': 1}, 'pmi_doc': {'$gte': threshold}},

@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # 1134 words have 642411 unique pairs
 #     count = 0
     for pair in list(combinations(single_words, 2))[:max_items]:
-        key = str(sorted(pair, key=unicode.lower))
+        key = str(sorted(pair, key=str.lower))
         if key not in similarity:
             score = 0.0
             if pair[0] == pair[1]:
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     with open(outfile, 'w') as f:
         json.dump(similarity, f)
         
-    print 'done'
+    print('done')
     # calculate a score for each pair of projects in the dataset
     #
     # score = sum of keyword similarities for all pairs of keywords 
