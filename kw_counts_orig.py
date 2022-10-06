@@ -1,12 +1,13 @@
 from __future__ import unicode_literals
 import json
-from pymongo import MongoClient
+
+
 from collections import Counter, defaultdict
 
 
-client = MongoClient('proximus.modulusmongo.net:27017')
-client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
-db = client.tepO9seb
+
+
+db = authenticate_to_mongo.db_json_from_agency()
 
 if __name__ == '__main__':
     counts = Counter()

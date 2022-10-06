@@ -12,7 +12,8 @@ import urllib
 import json
 import re
 import pymongo
-from pymongo import MongoClient
+
+
 from spacetag import app
 from . import valueFromRequest
 
@@ -36,9 +37,9 @@ def getCoOccuringKWsFlat():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    client = MongoClient('proximus.modulusmongo.net:27017')
-    client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
-    db = client.tepO9seb
+
+
+    db = authenticate_to_mongo.db_json_from_agency()
 
     results = db.keywords.find(
         {"source": "http://data.nasa.gov/data.json", "keyword": re.compile(r'^' + query, re.IGNORECASE)},
@@ -67,9 +68,9 @@ def getEdges():
     keywords = json.loads(valueFromRequest(key="kws", request=request))
     threshold = float(valueFromRequest(key="threshold", default=-0.5, request=request))
 
-    client = MongoClient('proximus.modulusmongo.net:27017')
-    client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
-    db = client.tepO9seb
+
+
+    db = authenticate_to_mongo.db_json_from_agency()
 
     results = db.nasa_np_strengths_b.find(
         {'keyword': {"$in": keywords}, 'count': {'$gt': 1}, 'pmi_doc': {'$gte': threshold}},
@@ -129,9 +130,9 @@ def getCoOccuringKWsGraph():
     else:
         keyword = re.compile(r'^' + query, re.IGNORECASE)
 
-    client = MongoClient('proximus.modulusmongo.net:27017')
-    client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
-    db = client.tepO9seb
+
+
+    db = authenticate_to_mongo.db_json_from_agency()
 
     results = db.keywords.find(
         {"source": "http://data.nasa.gov/data.json", "keyword": keyword},
@@ -211,9 +212,9 @@ def getDatasets():
         'source': 1
     }
 
-    client = MongoClient('proximus.modulusmongo.net:27017')
-    client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
-    db = client.tepO9seb
+
+
+    db = authenticate_to_mongo.db_json_from_agency()
 
     results = db.datasets.find({"description_ngram_np": query}, fields)
 
@@ -236,9 +237,9 @@ def getRelatedDatasets():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    client = MongoClient('proximus.modulusmongo.net:27017')
-    client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
-    db = client.tepO9seb
+
+
+    db = authenticate_to_mongo.db_json_from_agency()
 
     results = db.related_datasets.find({'identifier': identifier}, {'_id': 0}).sort([('sim', -1)])
 
@@ -258,9 +259,9 @@ def getDatasetsByIdentifier():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    client = MongoClient('proximus.modulusmongo.net:27017')
-    client.tepO9seb.authenticate('nasahack', 'hacking4nasa')
-    db = client.tepO9seb
+
+
+    db = authenticate_to_mongo.db_json_from_agency()
 
     results = db.datasets.find({'identifier': {'$in': identifiers}}, {'_id': 0, "landingPage": 1, "title": 1})
 
